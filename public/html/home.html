@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeosMentis - Home</title>
+    <link rel="icon" href="/logo/logo_B.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/home_page.css">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="load_div">
+        <div class="loader"></div>
+    </div>
+
+
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_acces_header">
+            <div class="div_home_bnt">
+                <a href="/">Home</a>
+                <a href="/project">Project</a>
+            </div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_B.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_compte_header">
+            <div class="div_profil_bnt">
+                <a href="/log?type=log">Login</a>
+                <a href="/log?type=register">Register</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="snap_grid">
+            <div class="div_snap_big" id="b1">
+                <div class="div_snap_small" id="1"></div>
+                <div class="div_snap_small" id="2"></div>
+                <div class="div_snap_small" id="3"></div>
+                <div class="div_snap_small" id="4"></div>
+                <div class="div_snap_small" id="5"></div>
+                <div class="div_snap_small" id="6"></div>
+                <div class="div_snap_small end" id="7"></div>
+                <div class="div_snap_small end" id="8"></div>
+            </div>
+            <div class="div_snap_big" id="b2">
+                <div class="div_snap_small" id="9"></div>
+                <div class="div_snap_small" id="10"></div>
+                <div class="div_snap_small" id="11"></div>
+                <div class="div_snap_small" id="12"></div>
+                <div class="div_snap_small" id="13"></div>
+                <div class="div_snap_small" id="14"></div>
+                <div class="div_snap_small end" id="15"></div>
+                <div class="div_snap_small end" id="16"></div>
+            </div>
+            <div class="div_snap_big" id="b3">
+                <div class="div_snap_small" id="17"></div>
+                <div class="div_snap_small" id="18"></div>
+                <div class="div_snap_small" id="19"></div>
+                <div class="div_snap_small" id="20"></div>
+                <div class="div_snap_small" id="21"></div>
+                <div class="div_snap_small" id="22"></div>
+                <div class="div_snap_small end" id="23"></div>
+                <div class="div_snap_small end" id="24"></div>
+            </div>
+            <div class="div_snap_big" id="b4">
+                <div class="div_snap_small" id="25"></div>
+                <div class="div_snap_small" id="26"></div>
+                <div class="div_snap_small" id="27"></div>
+                <div class="div_snap_small" id="28"></div>
+                <div class="div_snap_small" id="29"></div>
+                <div class="div_snap_small" id="30"></div>
+                <div class="div_snap_small end" id="31"></div>
+                <div class="div_snap_small end" id="32"></div>
+            </div>
+        </div>
+        <!-- <div class="div_event green document">
+            <div class="div_header_event">
+                <div class="div_round_trou hand"></div>
+                <div class="div_document_titre">
+                    <h2>Documents</h2>
+                </div>
+                <div class="div_round_pointe"></div>
+            </div>
+
+            <div class="div_content">
+                <div class="div_doc">
+                    <h2>Document 1</h2>
+                </div>
+            </div>
+        </div> -->
+
+    </main>
+
+
+    <div class="div_background">
+    </div>
+</body>
+<script src="js/home_page_document.js"></script>
+<script>
+
+    // desactiver le clique droit de base
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    function removeContextMenu() {
+        const contextmenu = document.querySelector('.contextmenu');
+        if (contextmenu) {
+            contextmenu.remove();
+        }
+    }
+
+    function contextmenu(x, y, id_doc) {
+        let remove = false;
+        removeContextMenu()
+        const div = document.createElement('div');
+        div.classList.add('contextmenu');
+
+        const div1 = document.createElement('div');
+        div1.className = 'contextmenu-item';
+        div1.id = 'delete';
+        div1.innerHTML = 'Delete';
+        div1.addEventListener('click', () => {
+            if (!remove) {
+                div1.style.backgroundColor = 'var(--rouge)';
+                remove = true;
+            } else {
+                console.log('delete');
+                remove_document(id_doc);
+            }
+        });
+
+        const div2 = document.createElement('div');
+        div2.className = 'contextmenu-item';
+        div2.id = 'edit';
+        div2.innerHTML = 'Edit';
+        div2.addEventListener('click', () => {
+            console.log('edit');
+        });
+
+        div.appendChild(div1);
+        div.appendChild(div2);
+
+
+        div.style.left = `${x}px`;
+        div.style.top = `${y}px`;
+
+        document.body.appendChild(div);
+    }
+
+    // gérer le clique droit sur les divs
+    document.addEventListener('mousedown', (e) => {
+        if (e.button === 2) {
+            if (e.target.classList.contains('div_doc')) {
+                contextmenu(e.clientX, e.clientY, e.target.id);
+            }
+
+        }
+    });
+
+    // rajouter 5 div_round 
+    for (let i = 0; i < 20; i++) {
+        const div = document.createElement('div');
+        div.classList.add('div_round');
+
+        // Set random values as CSS custom properties
+        div.style.setProperty('--x', `${Math.floor(Math.random() * 100)}vw`);
+        div.style.setProperty('--y', `${Math.floor(Math.random() * 100)}vh`);
+        div.style.setProperty('--size', `${Math.floor(Math.random() * 100) + 5}px`);
+        div.style.setProperty('--move_x', `${(Math.random() * 500 + 5) * -1}px`);
+        div.style.setProperty('--move_y', `${(Math.random() * 500 + 5) * -1}px`);
+
+        let speed = Math.floor(Math.random() * 10) + 5;
+        div.style.setProperty('--speed', `${speed}s`);
+
+        setInterval(() => {
+            div.style.setProperty('--size', `${Math.floor(Math.random() * 100) + 5}px`);
+            if (Math.random() < 0.5) {
+                div.style.setProperty('--move_x', `${(Math.random() * 500 + 5) * -1}px`);
+            } else {
+                div.style.setProperty('--move_x', `${(Math.random() * 500 + 5)}px`);
+            }
+
+            if (Math.random() > 0.5) {
+                div.style.setProperty('--move_y', `${(Math.random() * 500 + 5) * -1}px`);
+            } else {
+                div.style.setProperty('--move_y', `${(Math.random() * 500 + 5)}px`);
+            }
+        }, speed * 1000);
+        document.querySelector('.div_background').appendChild(div);
+    }
+
+
+
+
+
+
+</script>
+
+</html>

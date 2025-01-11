@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Séparateur de lignes (avec word-wrap)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            resize: both;
+        }
+        .mirror {
+            position: absolute;
+            top: 0;
+            left: 0;
+            visibility: hidden;
+            pointer-events: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            box-sizing: border-box; 
+        }
+        button {
+            padding: 8px 16px;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h2>Version améliorée avec word-wrap</h2>
+    <div class="container">
+        <textarea id="textArea">Essayez d'écrire un très long texte ici qui va automatiquement passer à la ligne quand il atteint la fin de la zone. Vous pouvez aussi redimensionner la textarea pour voir comment le texte se réorganise.</textarea>
+        <div id="mirror" class="mirror"></div>
+    </div>
+    <button onclick="getVisualLines()">Obtenir les lignes</button>
+    <pre id="result"></pre>
+
+    <script>
+        function copyTextareaStyles(textarea, mirror) {
+            const style = window.getComputedStyle(textarea);
+            const copyProperties = [
+                'width', 'height', 'padding', 'border', 'font-size',
+                'font-family', 'line-height', 'text-indent',
+                'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+                'box-sizing'
+            ];
+            
+            copyProperties.forEach(prop => {
+                mirror.style[prop] = style[prop];
+            });
+        }
+
+        function getVisualLines() {
+            const textarea = document.getElementById('textArea');
+            const mirror = document.getElementById('mirror');
+            const text = textarea.value;
+            
+            // Copier les styles
+            copyTextareaStyles(textarea, mirror);
+            
+            // Créer des spans pour chaque caractère
+            const spans = text.split('').map((char, i) => {
+                return `<span id="char${i}">${char === '\n' ? '⏎' : char}</span>`;
+            }).join('');
+            
+            mirror.innerHTML = spans;
+            
+            const lines = [];
+            let currentLine = '';
+            let lastTop = null;
+            
+            // Parcourir chaque caractère
+            for (let i = 0; i < text.length; i++) {
+                const span = document.getElementById(`char${i}`);
+                const rect = span.getBoundingClientRect();
+                
+                // Si c'est une nouvelle ligne (visuellement ou \n)
+                if (lastTop !== null && (rect.top > lastTop || text[i] === '\n')) {
+                    lines.push(currentLine);
+                    currentLine = '';
+                }
+                
+                currentLine += text[i] === '\n' ? '' : text[i];
+                lastTop = rect.top;
+            }
+            
+            // Ajouter la dernière ligne
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+            
+            // Afficher le résultat
+            document.getElementById('result').textContent = 
+                JSON.stringify(lines, null, 2);
+        }
+
+        // Mettre à jour quand la textarea est redimensionnée
+        const textarea = document.getElementById('textArea');
+        let resizeTimeout;
+        const resizeObserver = new ResizeObserver(() => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(getVisualLines, 100);
+        });
+        resizeObserver.observe(textarea);
+    </script>
+</body>
+</html>

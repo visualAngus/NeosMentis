@@ -1,0 +1,176 @@
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    
+}
+
+header{
+    background-color: var(--contrast-vert);
+    color: var(--text-color);
+    margin-top: 10px;
+    height: 70px;
+    width: 95%;
+    border-radius: 35px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    
+    overflow: hidden;
+    
+    user-select: none;
+
+    box-shadow: 5px 5px 10px -0px var(--noir-shadow);
+
+}
+header div{
+    width: 33%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+
+    
+}
+header div a{
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.5em;
+
+    transition: color var(--transition);
+}
+header div a:hover{
+    color: var(--soft-vert);
+}
+header div a:active{
+    color: var(--violet);
+}
+.div_home_bnt{
+    width: 100%;
+    padding: 0px 20px;
+
+}
+
+/* center header */
+.div_center_header{
+    justify-content: center;
+    padding: 0px 20px;
+
+}
+.div_center_header h1{
+    font-size: 3em;
+    font-weight: 900;
+    font-style: bold;
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    color: var(--text-color);
+}
+.div_center_header img{
+    height: 80%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center;
+    transition: all var(--transition);
+}
+/* div_compte_header */
+.div_compte_header{
+    justify-content: flex-end;
+
+}
+.div_profil_bnt,.div_profil_name{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0px 20px;
+
+
+    font-weight: 700 !important; 
+}
+.div_profil_name{
+    font-weight: 800 !important;
+}
+.div_profil_name h2{
+    width: 150px;
+    cursor: pointer;
+    transition: color var(--transition);
+
+    text-align: center;
+}
+.div_profil_name h2:hover{
+    color: var(--bleu);
+}
+
+.div_param_acc_tel{
+    display: none;
+}
+
+@media screen and (max-width:850px){
+    header{
+        width: 100%;
+        border-radius: 0 35px 35px 0;
+
+    }
+    header div{
+        width: 100%;
+        justify-content: center;
+    }
+    header div a{
+        font-size: 1.2em;
+    }
+    .div_acces_header,.div_compte_header{
+        display: none;
+    }
+    .div_center_header h1{
+        font-size: clamp(2em, 8vw, 3em);
+    }
+    .div_param_acc_tel{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 50px;
+
+        cursor: pointer;
+        transition: all var(--transition);
+    }
+    .ligne{
+        width: 2px;
+        height: 50%;
+        background-color: var(--text-color);
+        padding: 0px;
+    }
+    .div_param_acc_tel:active{
+        transform: rotate(90deg);
+        
+        .ligne{
+            background-color: var(--violet);
+        }
+    }
+}
+
+/* div_profil_menu */
+.div_profil_menu{
+    width: 150px;
+    height: 500px;
+    background-color: var(--contrast-vert);
+
+    position: absolute;
+
+    border-radius: 0 0 20px 20px;
+
+    padding: 10px 20px
+}

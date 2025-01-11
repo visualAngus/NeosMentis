@@ -1,0 +1,163 @@
+body{
+    background-color: var(--noir);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    height: 100vh;
+    width: 100vw;
+}
+
+main{
+    height: calc(100% - 2*80px);
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.div_log_register{
+    width: 700px;
+    height: 500px;
+    border-radius: 35px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--gris);
+    box-shadow: 10px 10px 12px 0px var(--noir-shadow), inset 100px 100px 100px -100px var(--soft-vert-shadow);
+}
+.div_log, .div_register{
+    width: calc(50% - 1px);
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.div_trou{
+    height: 50px;
+    margin: 10px;
+}
+.div_sep{
+    width: 2px;
+    height: 80%;
+    background-color: var(--text-color);    
+    box-shadow: 10px 10px 12px 0px var(--noir-shadow);
+
+}
+.div_log_title,.div_register_title{
+    font-size: 1.5em;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--text-color);
+    margin: 20px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+
+    filter: drop-shadow(10px 10px 12px var(--noir-shadow));
+
+}
+.div_log_form,.div_register_form{
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.div_log_form_input,.div_register_form_input{
+    width: 80%;
+    height: 50px;
+    margin: 10px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.div_log_form_input label,.div_register_form_input label{
+    width: 125px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    color: var(--text-color);
+
+    text-align: right;
+    
+    filter: drop-shadow(10px 10px 12px var(--noir-shadow));
+}
+
+.div_log_form_input input[type="text"],[type="email"],[type="password"] ,.div_register_form_input input[type="text"],[type="email"],[type="password"]{
+    width: 100%;
+    height: 35px;
+
+    outline: none;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 1em;
+    color: var(--noir);
+
+    background-color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+
+    box-shadow: 10px 10px 12px 0px var(--noir-shadow);
+
+}
+
+.div_log_form_input,.div_register_form_input{
+    display: flex;
+    flex-direction: row;    
+    align-items: center;
+    justify-content: center;
+}
+.div_log_form_input input[type="submit"],.div_register_form_input input[type="submit"]{
+    width: 100px;
+    height: 40px;
+    margin: 20px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 1em;
+    color: var(--noir);
+
+    background-color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all var(--transition);
+
+    box-shadow: 10px 10px 12px 0px var(--noir-shadow);
+}
+.div_log_form_input input[type="submit"]:hover{
+    background-color: var(--soft-vert);
+    box-shadow: 7px 7px 9px 0px var(--noir-shadow);
+
+}
+.div_log_form_input input[type="submit"]:active{
+    background-color: var(--contrast-vert);
+    color: var(--text-color);
+    box-shadow: 3px 3px 5px 0px var(--noir-shadow);
+
+}

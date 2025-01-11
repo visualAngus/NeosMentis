@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipTap Editor</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/editor.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_acces_header">
+            <div class="div_home_bnt">
+                <a href="/">Home</a>
+                <a href="/project">Project</a>
+            </div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_B.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_compte_header">
+            <div class="div_profil_bnt">
+                <a href="/log?type=log">Login</a>
+                <a href="/log?type=register">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="load_div">
+        <div class="loader"></div>
+    </div>
+    <main>
+        <div class="div_bnt_editor">
+            <div class="title">
+                <input type="text" id="title" placeholder="Title">
+            </div>
+            <div class="bnt_div_child">
+                <div id="saveButton" class="cdx-button">
+                    Save
+                </div>
+                <div id="shareButton" class="cdx-button">
+                    Share
+                </div>
+            </div>
+        </div>
+        <div id="editorjs" class="editor-container"></div>
+        <div id="editorjs2" class="editor-container"></div>
+    </main>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/style_react.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeosMentis - Log</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/log.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_acces_header">
+            <div class="div_home_bnt">
+                <a href="/">Home</a>
+                <a href="/project">Project</a>
+            </div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_B.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_compte_header">
+            <div class="div_profil_bnt">
+                <a href="/log?type=log">Login</a>
+                <a href="/log?type=register">Register</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="div_log_register">
+            <div class="div_log">
+                <div class="div_log_title">
+                    <h2>Login</h2>
+                </div>
+                <div class="div_log_form">
+                    <div class="div_log_form_input">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" id="username" required>
+                    </div>
+                    <div class="div_log_form_input">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password" required>
+                    </div>
+                    <div class="div_trou">
+
+                    </div>
+                </div>
+                <div class="div_log_form_input">
+                    <input class="log_btn" type="submit" value="Login">
+                </div>
+
+            </div>
+            <div class="div_sep"></div>
+            <div class="div_register">
+                <div class="div_register_title">
+                    <h2>Register</h2>
+                </div>
+                <div class="div_register_form">
+                    <div class="div_register_form_input">
+                        <label for="username">Username</label>
+                        <input type="text" name="username" id="username_re" required>
+                    </div>
+                    <div class="div_register_form_input">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email_re" required>
+                    </div>
+                    <div class="div_register_form_input">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password_re" required>
+                    </div>
+                </div>
+                <div class="div_register_form_input">
+                    <input class="register_btn" type="submit" value="Register">
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+    let log_btn = document.querySelector('.log_btn');
+    let register_btn = document.querySelector('.register_btn');
+
+    log_btn.addEventListener('click', () => {
+        let username = document.querySelector('#username').value;
+        let password = document.querySelector('#password').value;
+
+        if (username === '' || password === '') {
+            alert('Please fill all fields');
+            return;
+        }
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
+    register_btn.addEventListener('click', () => {
+        console.log('register');
+        let username = document.querySelector('#username_re').value;
+        let email = document.querySelector('#email_re').value;
+        let password = document.querySelector('#password_re').value;
+
+        if (username === '' || email === '' || password === '') {
+            alert('Please fill all fields');
+            return;
+        }
+
+        fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+
+</script>
+</html>

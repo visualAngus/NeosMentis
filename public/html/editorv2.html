@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/editor2.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_acces_header">
+            <div class="div_home_bnt">
+                <a href="/">Home</a>
+                <a href="/project">Project</a>
+            </div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_B.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_compte_header">
+            <div class="div_profil_bnt">
+                <a href="/log?type=log">Login</a>
+                <a href="/log?type=register">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="editor">
+
+            <div class="codex-editor">
+                <div class="codex-editor__redactor">
+                    <!-- <textarea
+                        id="textArea">Essayez d'écrire un très long texte ici qui va automatiquement passer à la ligne quand il atteint la fin de la zone. Vous pouvez aussi redimensionner la textarea pour voir comment le texte se réorganise.</textarea> -->
+                    <div id="editor_div" class="editor-content" contenteditable="true"></div>
+                    <div id="mirror" class="mirror"></div>
+                </div>
+                <div class="ce-toolbar">
+                    <div class="ce-toolbar__actions">
+                        <div class="ce-toolbar__plus">
+                            +
+                        </div>
+                        <div class="ce-toolbar__settings">
+                            .. <br>
+                            .. <br>
+                            .. <br>
+                        </div>
+                    </div>
+                    <div class="ce-toolbox closed">
+                        <div class="ce-popover__recherche">
+                            <div class="div_recherche_logo">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <circle cx="10.5" cy="10.5" r="5.5" stroke="currentColor" stroke-width="2"></circle>
+                                    <line x1="15.4142" x2="19" y1="15" y2="18.5858" stroke="currentColor"
+                                        stroke-linecap="round" stroke-width="2"></line>
+                                </svg>
+                            </div>
+                            <input type="text" class="div_recherche_input" placeholder="Recherche">
+                        </div>
+                        <div class="ce-popover__items">
+                            <!-- <div class="ce-popover_item">
+                                <div class="ce-popover_item_logo">
+                                </div>
+                                <div class="ce-popover_item_nom">
+                                    <h3>Titre</h3>
+                                </div>
+                            </div> -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+<script>
+    const editor_div = document.getElementById('editor_div');
+    const mirror = document.getElementById('mirror');
+    const editor = document.querySelector('.editor');
+    const ce_toolbar = document.querySelector('.ce-toolbar');
+
+    // Initialisation de l'éditeur
+    if (editor_div.innerHTML.trim() === '') {
+        editor_div.innerHTML = '<div class="line"></div>';
+    }
+
+    // Copie des styles entre l'éditeur et le miroir
+    function copyEditorStyles() {
+        const style = window.getComputedStyle(editor_div);
+        const copyProperties = [
+            'width', 'height', 'padding', 'border', 'font-size',
+            'font-family', 'line-height', 'text-indent',
+            'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+            'box-sizing'
+        ];
+
+        copyProperties.forEach(prop => {
+            mirror.style[prop] = style[prop];
+        });
+    }
+
+    // Obtenir les lignes visuelles
+    function getVisualLines() {
+        copyEditorStyles();
+
+        // Créer une copie du contenu avec des spans pour chaque ligne
+        const lines = [];
+        const children = editor_div.children;
+
+        Array.from(children).forEach((child, index) => {
+            const lineContent = child.textContent || '\n';
+            lines.push({
+                content: lineContent,
+                element: child,
+                index: index,
+                type: child.classList.contains('titre') ? 'titre' :
+                    child.classList.contains('quote') ? 'quote' : 'normal'
+            });
+        });
+
+        // Mettre à jour le miroir
+        updateMirror(lines);
+
+        return lines;
+    }
+
+    // Mise à jour du miroir
+    function updateMirror(lines) {
+        mirror.innerHTML = '';
+
+        lines.forEach(line => {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = `mirror-line ${line.type}`;
+            if (line.type === 'liste') {
+                const ul = document.createElement('ul');
+                const li = document.createElement('li');
+                li.textContent = line.content;
+                ul.appendChild(li);
+                lineDiv.appendChild(ul);
+            } else {
+                lineDiv.textContent = line.content;
+            }
+            lineDiv.dataset.index = line.index;
+            mirror.appendChild(lineDiv);
+        });
+    }
+
+    // Gestion des commandes
+    function unfocus_commande() {
+        ce_toolbar.setAttribute('type', '');
+        ce_toolbar.querySelector('.ce-toolbox').classList.add('closed');
+    }
+
+    function show_commande(top, index) {
+        ce_toolbar.style.top = `${top}px`;
+        ce_toolbar.setAttribute('index', index);
+    }
+
+    // Modification du style d'une ligne
+    function change_style_line(lineIndex, style) {
+        const lines = Array.from(editor_div.children);
+        if (lines[lineIndex]) {
+            // Retirer les classes de style existantes
+            lines[lineIndex].className = 'line';
+            // Ajouter le nouveau style
+            lines[lineIndex].classList.add(style);
+            // Mettre à jour le miroir
+            getVisualLines();
+        }
+    }
+
+    // Insertion d'une nouvelle ligne
+    function insert_new_line(index,type='normal') {
+        const lines = Array.from(editor_div.children);
+        if (lines[index] || index === 0) {
+            const newLine = document.createElement('div');
+            const selection = window.getSelection();
+            const range = document.createRange();
+            newLine.className = 'line';
+
+            if (type === 'normal') {
+                newLine.innerHTML = '<br>'
+                range.setStart(newLine, 0);
+                range.collapse(true);
+            }
+            if (type === 'liste') {
+                newLine.innerHTML = '<ul><li><br></li></ul>';
+                range.setStart(newLine.querySelector('li'), 0);
+                range.collapse(true);
+            }
+
+            if (index === lines.length) {
+                editor_div.appendChild(newLine);
+            } else {
+                lines[index].after(newLine);
+            }
+
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // Mettre à jour le miroir
+            getVisualLines();
+        }
+    }
+
+    // Configuration de la liste des commandes
+    function set_commande_list() {
+        let list = ["Titre", "Liste", "Liste numérotée", "Checklist", "Citation", "Tableau", "Lien", "Image", "Fichier"];
+        let ce_popover_items = document.querySelector('.ce-popover__items');
+        ce_popover_items.innerHTML = '';
+
+        list.forEach(element => {
+            let div = document.createElement('div');
+            div.className = 'ce-popover_item';
+
+            div.addEventListener('click', function (event) {
+                let index = parseInt(ce_toolbar.getAttribute('index'));
+                if (element === "Titre") {
+                    insert_new_line(index,'normal');
+                    change_style_line(index + 1, 'titre');
+                    unfocus_commande();
+                }
+                if (element === "Liste") {
+                    insert_new_line(index,'liste');
+                    change_style_line(index + 1, 'liste');
+                    unfocus_commande();
+                }
+            });
+
+            let div_logo = document.createElement('div');
+            div_logo.className = 'ce-popover_item_logo';
+
+            let div_nom = document.createElement('div');
+            div_nom.className = 'ce-popover_item_nom';
+            let h3 = document.createElement('div');
+            h3.innerHTML = element;
+            div_nom.appendChild(h3);
+
+            div.appendChild(div_logo);
+            div.appendChild(div_nom);
+            ce_popover_items.appendChild(div);
+        });
+    }
+
+    // Event Listeners
+    editor.addEventListener('click', function (event) {
+        if (event.target.classList.contains('editor')) {
+            unfocus_commande();
+        }
+    });
+
+    ce_toolbar.querySelector('.ce-toolbar__plus').addEventListener('click', function (event) {
+        const toolbox = ce_toolbar.querySelector('.ce-toolbox');
+        toolbox.classList.toggle('closed');
+    });
+
+    editor_div.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const selection = window.getSelection();
+            const line = selection.anchorNode.parentElement;
+
+            // si line est une liste
+            if (line.tagName === 'LI') {
+                const ul = line.parentElement;
+                const newLine = document.createElement('li');
+                newLine.innerHTML = '<br>';
+                ul.appendChild(newLine);
+                const range = document.createRange();
+                range.setStart(newLine, 0);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                return;
+            }
+
+            const currentIndex = Array.from(editor_div.children).indexOf(line);
+            console.log(currentIndex);
+            if (currentIndex == -1) {
+                insert_new_line(0);
+                return;
+            }
+            insert_new_line(currentIndex);
+        }
+    });
+
+    editor_div.addEventListener('input', function () {
+        getVisualLines();
+    });
+
+    editor_div.addEventListener('mousemove', function (event) {
+        const rect = editor_div.getBoundingClientRect();
+        const lineHeight = parseInt(window.getComputedStyle(editor_div).lineHeight);
+        const offsetY = event.clientY - rect.top;
+        const lineIndex = Math.floor(offsetY / lineHeight);
+
+        const lines = getVisualLines();
+        if (lineIndex >= 0 && lineIndex < lines.length) {
+            let line = lines[lineIndex];
+
+            // select dans le miroir
+            const mirrorLines = Array.from(mirror.children);
+            y_top_of_editor = editor_div.getBoundingClientRect().top;
+
+            y = mirrorLines[lineIndex - 1].getBoundingClientRect().top - y_top_of_editor;
+
+            show_commande(y, lineIndex - 1);
+        } else if (lineIndex >= lines.length) {
+            // Gestion du curseur sur la dernière ligne
+            const lastLine = lines[lines.length - 1];
+            const mirrorLines = Array.from(mirror.children);
+            y_top_of_editor = editor_div.getBoundingClientRect().top;
+
+            y = mirrorLines[mirrorLines.length - 1].getBoundingClientRect().top - y_top_of_editor;
+
+            show_commande(y, lines.length - 1);
+        }
+    });
+
+    // Initialisation
+    set_commande_list();
+</script>
+
+</html>
