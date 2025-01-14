@@ -681,12 +681,25 @@ wss.on('connection', (ws) => {
                     if (key !== clientId) {
                         const client = clients.get(key);
                         if (client) {
-                            client.send(JSON.stringify({ type: 'notification', from: clientId, message: parsedMessage.message }));
+                            client.send(JSON.stringify({ type: 'modification_text', from: clientId, message: parsedMessage.message }));
                         }
                     }
                 }
             });
         }
+        if (parsedMessage.type === 'cursor_move') {
+            clents_status.forEach((value, key) => {
+                if (value === parsedMessage.doc) {
+                    if (key !== clientId) {
+                        const client = clients.get(key);
+                        if (client) {
+                            client.send(JSON.stringify({ type: 'cursor_move', from: clientId, message: parsedMessage.message }));
+                        }
+                    }
+                }
+            });
+        }
+        console.log(clents_status);
 
         // afficher tout les clents_status qui ont parsedMessage.message = "43"
         
