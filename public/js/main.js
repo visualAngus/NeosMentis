@@ -115,7 +115,6 @@ document.getElementById('saveButton').addEventListener('click', () => {
                 console.error('Save failed:', data.message);
             }
         })
-        .catch(error => console.error('Error:', error));
 
 
     }).catch((error) => {

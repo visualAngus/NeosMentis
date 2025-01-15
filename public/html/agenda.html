@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeosMentis - Agenda</title>
+
+    <link rel="icon" href="/logo/logo_B.png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/agenda.css">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_acces_header">
+            <div class="div_home_bnt">
+                <a href="/">Home</a>
+                <a href="/project">Project</a>
+            </div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_B.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_compte_header">
+            <div class="div_profil_bnt">
+                <a href="/log?type=log">Login</a>
+                <a href="/log?type=register">Register</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="agenda">
+            <div class="div_control">
+            </div>
+            <div class="div_jours">
+                <div class="div_jour_nom">
+                    <p>Lundi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Mardi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Mercredi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Jeudi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Vendredi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Samedi</p>
+                </div>
+                <div class="div_jour_nom">
+                    <p>Dimanche</p>
+                </div>
+            </div>
+            <div class="div_agenda_ctrl">
+                <div class="div_heures">
+                    <div class="div_heure non">
+                        <p>00:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>01:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>02:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>03:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>04:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>05:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>06:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>07:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>08:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>09:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>10:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>11:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>12:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>13:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>14:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>15:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>16:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>17:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>18:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>19:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>20:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>21:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>22:00</p>
+                    </div>
+                    <div class="div_heure">
+                        <p>23:00</p>
+                    </div>
+                </div>
+                <div class="div_agenda">
+                    <div class="div_jour">
+                        <div class="div_event" id="e1">
+
+                        </div>
+                        <div class="div_event" id="e2">
+
+                        </div>
+                        <div class="div_event" id="e3">
+
+                        </div>
+
+                    </div>
+                    <div class="div_jour" id="2">
+                        <div class="div_event" id="e1">
+
+                        </div>
+                    </div>
+                    <div class="div_jour"></div>
+                    <div class="div_jour"></div>
+                    <div class="div_jour"></div>
+                    <div class="div_jour"></div>
+                    <div class="div_jour"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+    function addEvent(id, name, start, end, overlap_count, index, color) {
+        let event = document.createElement("div");
+        let isclick = false;
+
+
+        event.id = id;
+        event.className = "div_event";
+        event.innerHTML = name;
+        event.style.backgroundColor = color;
+        event.style.height = `calc((${end} - ${start}) * 40px)`;
+        event.style.top = `calc(${start} * 40px)`;
+        event.style.left = `calc((100% / ${overlap_count}) * ${index} - 2.5px)`;
+        event.style.width = `calc(100% / ${overlap_count} - 2.5px)`;
+
+        let initialY = 0;
+        event.addEventListener("mousedown", function (e) {
+            isclick = true;
+            initialY = e.clientY - event.offsetTop;
+        });
+        event.addEventListener("mouseup", function () {
+            isclick = false;
+        });
+        document.addEventListener("mousemove", function (e) {
+            if (isclick) {
+                let newTop = e.clientY - initialY;
+                newTop = newTop/10;
+                newTop = Math.round(newTop) * 10;
+                event.style.top = `${newTop}px`;
+
+                let div_jour = document.querySelector(".div_jour");
+                let div_jour_pos = div_jour.getBoundingClientRect();
+
+            }
+        });
+
+        return event;
+    }
+
+    document.getElementById("2").appendChild(addEvent("e4", "Event 1", 2, 10, 1, 0, "red"));
+</script>
+
+</html>

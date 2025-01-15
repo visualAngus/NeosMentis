@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>NeosMentis - Editor</title>
+    <link rel="icon" href="/logo/logo_B.png">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/editor2.css">
@@ -43,7 +43,24 @@
         </div>
     </header>
 
+    <div class="load_div">
+        <div class="loader"></div>
+    </div>
+
     <main>
+        <div class="div_bnt_editor">
+        <div class="title">
+            <input type="text" id="title" placeholder="Title">
+        </div>
+        <div class="bnt_div_child">
+            <div id="saveButton" class="cdx-button">
+                Save
+            </div>
+            <div id="shareButton" class="cdx-button">
+                Share
+            </div>
+        </div>
+    </div>
         <div class="editor">
 
             <div class="codex-editor">
@@ -92,332 +109,7 @@
         </div>
     </main>
 </body>
-<script>
-    const editor_div = document.getElementById('editor_div');
-    const editor = document.querySelector('.editor');
-    const editor_top = editor.getBoundingClientRect().top;
-    const ce_toolbar = document.querySelector('.ce-toolbar');
-
-    lineCounter = 0;
-
-    editor_div.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-
-            let selection = window.getSelection();
-            let range = selection.getRangeAt(0);
-            // let type = range.startContainer.nodeType;
-            let element = range.startContainer.parentElement;
-            if (element.tagName === "LI") {
-                element = element.parentElement;
-                if (element.tagName === "OL" || element.tagName === "UL") {
-                    element = element.parentElement;
-                }
-            }
-            let type = element.classList
-            let id_line = element.id;
-            console.log(id_line);
-
-            insert_new_line(id_line, type.value);
-        }
-    });
-
-    editor_div.addEventListener('input', (e) => {
-        let children = Array.from(editor_div.children);
-        children.forEach(child => {
-            if (!child.id) {
-                initialised_line(child);
-            }
-        });
-        save_editor();
-    });
-
-    function insert_line_id_position(id_line, position) {
-        let line = document.createElement('div');
-        line.id = id_line;
-        line.classList.add('line');
-        line.innerHTML = '';
-        let children = Array.from(editor_div.children);
-        if (position === 0) {
-            editor_div.insertBefore(line, children[position]);
-        } else {
-            editor_div.insertBefore(line, children[position - 1]);
-        }
-    }
-
-
-    function modified_line(id_line, new_text) {
-        // verifier si la ligne existe
-        if (document.getElementById(id_line) === null) {
-            insert_line_id_position(id_line, 0);
-        }
-        let line = document.getElementById(id_line);
-        line.innerHTML = new_text;
-    }
-
-
-    function save_editor() {
-        editor_div_tmp = editor_div.cloneNode(true);
-
-        let curseurs = Array.from(editor_div_tmp.getElementsByClassName('curseur'));
-        curseurs.forEach(curseur => {
-            curseur.remove();
-        });
-
-
-        const data = Array.from(editor_div_tmp.children).map(child => ({
-            id: child.id,
-            id_element_before: child.previousElementSibling ? child.previousElementSibling.id : null,
-            classList: Array.from(child.classList),
-            innerHTML: child.innerHTML,
-            children: Array.from(child.children).map(grandChild => ({
-                id: grandChild.id,
-                classList: Array.from(grandChild.classList),
-                innerHTML: grandChild.innerHTML
-            }))
-        }));
-        const jsonData = JSON.stringify(data, null, 2);
-        ws.send(JSON.stringify({
-            type: 'modification',
-            doc: new URLSearchParams(window.location.search).get('id'),
-            message: jsonData
-        }));
-    }
-
-    function load_editor(data) {
-        // Récupère la position du curseur
-        const selection = window.getSelection();
-        const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-        const cursor_position = range ? range.startOffset : 0;
-        const cursor_line = range && range.commonAncestorContainer.nodeType === Node.TEXT_NODE
-            ? range.commonAncestorContainer.parentNode.id
-            : range && range.commonAncestorContainer.classList.contains('line')
-                ? range.commonAncestorContainer.id
-                : "none";
-
-        // Supprime les lignes
-        // editor_div.innerHTML = '';
-        last_id = 0;
-        liste_id = [];
-
-        data.forEach(child => {
-            if (document.getElementById(child.id) !== null) {
-                child.classList.forEach(cls => document.getElementById(child.id).classList.add(cls));
-                document.getElementById(child.id).innerHTML = child.innerHTML;
-                last_id = child.id;
-                liste_id.push(child.id);
-                return;
-            }
-
-            let line = document.createElement('div');
-            line.id = child.id;
-            child.classList.forEach(cls => line.classList.add(cls));
-            line.innerHTML = child.innerHTML;
-
-            line.addEventListener('mouseover', (e) => {
-                let y = line.getBoundingClientRect().top - editor_top - 50;
-                show_commande(y, line.id);
-            });
-
-            if (child.id_element_before === null || !document.getElementById(child.id_element_before)) {
-                // append au debut de l'editeur 
-                editor_div.insertBefore(line, editor_div.firstChild);
-            } else {
-                const referenceNode = document.getElementById(child.id_element_before);
-                editor_div.insertBefore(line, referenceNode.nextSibling);
-            }
-            // editor_div.appendChild(line);
-
-            last_id = child.id;
-            liste_id.push(child.id);
-        });
-
-        // Supprime les lignes qui ne sont plus dans le document
-        const children = Array.from(editor_div.children);
-        children.forEach(child => {
-            if (!liste_id.includes(child.id)) {
-                child.remove();
-            }
-        });
-
-        // Replace le curseur
-        if (cursor_line !== "none") {
-            const cursor_line_element = document.getElementById(cursor_line);
-            if (cursor_line_element && cursor_line_element.childNodes.length > 0) {
-                const textNode = cursor_line_element.childNodes[0];
-                const newRange = document.createRange();
-                newRange.setStart(textNode, Math.min(cursor_position, textNode.length));
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
-        }
-    }
-
-    function move_cursor_other(id_other, id_line, position) {
-
-        if (!id_other || !id_line || !position) {
-            return;
-        }
-        // Remove existing cursor if any
-        let cursor = document.getElementById(id_other);
-
-        const line = document.getElementById(id_line);
-        if (!line) return;
-
-        if (!cursor) {
-            // Create cursor element
-            cursor = document.createElement('div');
-            cursor.id = id_other;
-            cursor.classList.add('curseur');
-            let nom = document.createElement('div');
-            nom.innerHTML = id_other;
-            nom.classList.add('nom_cursor');
-            cursor.appendChild(nom);
-            line.appendChild(cursor);
-        }
-
-        // Get the line's content and create a range for measurement
-        const text = line.textContent || line.innerText;
-        const range = document.createRange();
-        let offset_more = 0;
-        let textNode;
-
-        if (line.classList.contains('liste')) {
-            // Handle list items specifically
-            textNode = line.firstChild.firstChild;
-            textNode = Array.from(textNode.childNodes).find(node =>
-                node.nodeType === Node.TEXT_NODE
-            ) || line.appendChild(document.createTextNode(''));
-            offset_more = 48;
-        } else {
-            textNode = Array.from(line.childNodes).find(node =>
-                node.nodeType === Node.TEXT_NODE
-            ) || line.appendChild(document.createTextNode(''));
-        }
-
-        // Ensure the cursor position is within the bounds of the text length
-        const cursorPos = Math.min(position, text.length);
-        if (cursorPos > textNode.length) {
-            console.error('Cursor position exceeds text node length');
-            return;
-        }
-        // Set range to cover text up to cursor position
-        range.setStart(textNode, 0);
-        range.setEnd(textNode, cursorPos);
-
-        const measureElement = document.createElement('span');
-        measureElement.style.whiteSpace = 'pre-wrap';
-        
-        // chaque lettre est dans un span
-        measureElement.innerHTML = text.substring(0, cursorPos).split('').map(char => `<span>${char}</span>`).join('');
-
-        const style = window.getComputedStyle(line);
-        const copyProperties = [
-            'width', 'padding', 'border', 'font-size',
-            'font-family', 'line-height', 'text-indent',
-            'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-            'box-sizing'
-        ];
-
-        copyProperties.forEach(prop => {
-            measureElement.style[prop] = style[prop];
-        });
-        measureElement.style.wordBreak = 'break-word';
-        
-
-
-        // Insérer temporairement l'élément de mesure
-        const originalDisplay = line.style.display;
-        line.style.display = 'none';
-        document.body.appendChild(measureElement);
-
-        let last_lettre = measureElement.lastChild;
-        let lastLine = last_lettre.getBoundingClientRect();
-        document.body.removeChild(measureElement);
-        line.style.display = originalDisplay;
-        
-
-        const lineRect = line.getBoundingClientRect();
-        const xOffset = lastLine.right - lineRect.left;
-        const yOffset = (lineRect.top-180) + window.scrollY + offset_more;
-        
-        console.log(xOffset, yOffset);
-
-        cursor.style.position = 'absolute';
-        cursor.style.left = `${xOffset}px`;
-        cursor.style.top = `${yOffset}px`;
-
-        range.detach();
-    }
-
-    const ws = new WebSocket('ws://192.168.1.74:3000');
-
-
-    // des que le curseur bouge
-    document.addEventListener('selectionchange', () => {
-        const selection = window.getSelection();
-        const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-        const cursor_position = range ? range.startOffset : 0;
-
-        let range_elem = range.commonAncestorContainer.parentNode;
-
-        if (range_elem.tagName === "LI") {
-            range_elem = range_elem.parentElement;
-            if (range_elem.tagName === "OL" || range_elem.tagName === "UL") {
-                range_elem = range_elem.parentElement;
-            }
-        }
-
-        const cursor_line = range_elem.id;
-        console.log(cursor_line);
-
-        const jsonData = JSON.stringify({
-            cursor_position: cursor_position,
-            cursor_line: cursor_line
-        });
-
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'cursor_move',
-                doc: new URLSearchParams(window.location.search).get('id'),
-                message: jsonData
-            }));
-        }
-    });
-
-
-
-    // envoyer un message au serveur
-    ws.onopen = () => {
-        console.log('Connexion établie.');
-        ws.send(JSON.stringify({
-            type: 'info',
-            message: new URLSearchParams(window.location.search).get('id')
-        }));
-        console.log('Connexion établie 2.');
-        ws.send(JSON.stringify({
-            type: 'notification',
-            doc: new URLSearchParams(window.location.search).get('id'),
-            message: 'Je suis connecté.'
-        }));
-    };
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'welcome') {
-            console.log(`Mon ID est : ${data.clientId}`);
-        } else if (data.type === 'modification_text') {
-            Json_data = JSON.parse(data.message);
-            load_editor(Json_data);
-        } else if (data.type === 'cursor_move') {
-            let message = JSON.parse(data.message);
-            // move_cursor_other(data.from, message.cursor_line, message.cursor_position);
-        }
-    };
-
-
-</script>
 <script src="js/commande.js"></script>
+<script src="js/style_react.js"></script>
 
 </html>

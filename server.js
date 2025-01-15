@@ -89,13 +89,13 @@ app.get('/editor2', (req, res) => {
 
     res.sendFile('./public/html/editorv2.html', { root: __dirname })
 });
-app.get('/editor3', (req, res) => {
+app.get('/agenda', (req, res) => {
     let data = verificationAll(req,res);
     if (!data) {
         return res.redirect('/log');
     }
 
-    res.sendFile('./public/html/editorv3.html', { root: __dirname })
+    res.sendFile('./public/html/agenda.html', { root: __dirname })
 });
 
 app.post('/uploadFile', upload.single('file'), (req, res) => {
@@ -298,21 +298,28 @@ app.get('/accepter_les_partages', (req, res) => {
         if (results.length === 0) {
             return res.json({ success: true, message: 'No shared documents' });
         }
-        const encryptKey = results[0];
-        const decryptedKey = DecryptTexteWithPrimaryKey(encryptKey.encryptedData, SECRET_KEY, encryptKey.iv, encryptKey.authTag);
 
-        const secondaryKey = Buffer.from(req.cookies.secondaryKey, 'hex');
+        for (let i = 0; i < results.length; i++) {
+            const encryptKey = results[i];
+            const decryptedKey = DecryptTexteWithPrimaryKey(encryptKey.encryptedData, SECRET_KEY, encryptKey.iv, encryptKey.authTag);
 
-        const encryptedDocKey = encryptWithSecondaryKey(decryptedKey.toString('hex'), secondaryKey);
+            const secondaryKey = Buffer.from(req.cookies.secondaryKey, 'hex');
 
-        connection.query('INSERT INTO key_link (user_id_link, document_id_link, encryptedData, iv, authTag) VALUES (?, ?, ?, ?, ?)',
-            [data.userID, encryptKey.document_id_link, encryptedDocKey.encryptedData, encryptedDocKey.iv, encryptedDocKey.authTag], (error, _results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
+            const encryptedDocKey = encryptWithSecondaryKey(decryptedKey.toString('hex'), secondaryKey);
 
-            return res.json({ success: true, message: 'Document shared successfully' });
-        });
+            connection.query('INSERT INTO key_link (user_id_link, document_id_link, encryptedData, iv, authTag) VALUES (?, ?, ?, ?, ?)',
+                [data.userID, encryptKey.document_id_link, encryptedDocKey.encryptedData, encryptedDocKey.iv, encryptedDocKey.authTag], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                connection.query('DELETE FROM partages WHERE id_partage = ?', [encryptKey.id_partage], (error, _results) => {
+                    if (error) {
+                        return res.json({ success: false, message: error.message });
+                    }
+                });
+            });
+        }
+        return res.json({ success: true, message: 'Documents shared successfully' });
     });
 });
 

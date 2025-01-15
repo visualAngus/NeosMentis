@@ -53,7 +53,7 @@ setTimeout(() => {
     document.querySelector('.load_div').style.display = 'none';
 }, 500);
 
-async function fetchDocuments(userId) {
+async function fetchDocuments() {
     try {
         const response = await fetch(`/documents_by_user`);
         const data = await response.json();
@@ -110,7 +110,7 @@ async function create_document_base() {
         });
         const data = await response.json();
         if (data.success) {
-            window.location.href = `/editor?id=${data.id}`;
+            window.location.href = `/editor2?id=${data.id}`;
         } else {
             console.error('Error creating document:', data.message);
         }
@@ -183,7 +183,7 @@ function add_document(parent, title, id, add_div,date) {
     new_time = getTimeBetween(date);
     div.innerHTML = `<h2>${title}</h2> <p>${new_time}</p>`;
     div.addEventListener('click', () => {
-        window.location.href = `/editor?id=${id}`;
+        window.location.href = `/editor2?id=${id}`;
     });       
 
     parent.appendChild(div);
@@ -392,19 +392,19 @@ function create_document_groupe() {
 }
 
 // Using an immediately invoked async function
-(async () => {
-    let allDocuments = await fetchDocuments('');
+// (async () => {
+//     let allDocuments = await fetchDocuments();
 
-    if (!allDocuments) {
-        return;
-    }
+//     if (!allDocuments) {
+//         return;
+//     }
 
-    [parent,add_div] = create_document_groupe()
-    allDocuments.forEach(doc => {
-        console.log(doc);
-        add_document(parent, doc.title, doc.id,add_div,doc.last_modified);
-    });
-})();
+//     [parent,add_div] = create_document_groupe()
+//     allDocuments.forEach(doc => {
+//         console.log(doc);
+//         add_document(parent, doc.title, doc.id,add_div,doc.last_modified);
+//     });
+// })();
 
 setInterval(() => {
     if (update_skipped) {
@@ -432,7 +432,7 @@ window.addEventListener('mousedown', (e) => {
 
 
 
-function accepeterLesPartages(){
+async function accepeterLesPartages(){
     fetch('/accepter_les_partages', {
         method: 'GET',
         headers: {
@@ -440,14 +440,31 @@ function accepeterLesPartages(){
         }
     })
     .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        if (data.success) {
-            console.log('Document shared:', data.message);
+    .then(async data => {
+            console.log(data);
+            if (data.success) {
+                let allDocuments = await fetchDocuments();
+
+            if (!allDocuments) {
+                return;
+            }
+        
+            [parent,add_div] = create_document_groupe()
+
+            // supprimer les documents
+            let divs = document.querySelectorAll('.div_doc');
+            divs.forEach(div => {
+                div.remove();
+            });
+
+            allDocuments.forEach(doc => {
+                console.log(doc);
+                add_document(parent, doc.title, doc.id,add_div,doc.last_modified);
+            });
         } else {
             console.error('Share failed:', data.message);
         }
     })
     .catch(error => console.error('Error:', error));
 }
-// accepeterLesPartages();
+accepeterLesPartages();
