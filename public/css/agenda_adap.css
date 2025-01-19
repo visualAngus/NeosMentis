@@ -1,0 +1,33 @@
+@media screen and (max-width: 750px) {
+    .agenda {
+        width: 95%;
+        /* height: 90% ; */
+    }
+    .div_jour{
+        min-width: 25px;
+    }
+    .div_heures{
+        width: 30px;
+    }
+    .div_heure{
+        font-size: 0.6em;
+    }
+    .div_jour_nom{
+        font-size: 0.8em;
+    }
+    .div_jour_nom h4{
+        display: none;
+    }
+    .div_jours p{
+        font-size: 0.8em;
+    }
+    .div_jours {
+        width: calc(100% - 20px);
+        padding-right: 20px;
+    }
+    .date-picker-container{
+        font-size: 0.7em;
+        padding: 0px;
+    }
+    
+}

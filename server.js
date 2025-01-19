@@ -434,6 +434,78 @@ app.get('/logout', (req, res) => {
 });
 
 
+app.get('/agenda_events', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    connection.query("SELECT * FROM agenda_events WHERE user_id_link = ?", [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        console.log("results:", results);
+        // Group events by date
+        const groupedEvents = results.reduce((acc, event) => {
+            const date = event.date_event.toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = [];
+            }
+            acc[date].push({
+                id: "ev"+event.id_event.toString(),
+                title: event.title,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                group: event.group_id_link,
+                color: event.color,
+                linkedItems: JSON.parse(event.linkedItems || '{"notes":[],"sections":[]}'),
+                location: event.location,
+                description: event.description
+            });
+            return acc;
+        }, {});
+        return res.json({ success: true, events: groupedEvents });
+    });
+});
+
+app.post('/save_agenda_event', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    const id = req.body.id;
+    const title = req.body.title;
+    const date = req.body.date;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const group = req.body.group;
+    const color = req.body.color;
+    const linkedItems = JSON.stringify(req.body.linkedItems);
+    const location = req.body.location;
+    const description = req.body.description;
+
+    if (id) {
+        connection.query("UPDATE agenda_events SET title = ?, date_event = ?, startTime = ?, endTime = ?, group_id_link = ?, color = ?, linkedItems = ?, location = ?, description = ? WHERE id_event = ? AND user_id_link = ?",
+            [title, date, startTime, endTime, group, color, linkedItems, location, description, id, data.userID], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, message: 'Event updated successfully' });
+        });
+    } else {
+        connection.query("INSERT INTO agenda_events (title, date_event, startTime, endTime, group_id_link, color, linkedItems, location, description, user_id_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, date, startTime, endTime, group, color, linkedItems, location, description, data.userID], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, message: 'Event created successfully' });
+        });
+    }
+});
+
+
+
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 // });

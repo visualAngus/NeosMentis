@@ -10,12 +10,14 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/agenda.css">
+    <link rel="stylesheet" href="css/agenda_adap.css">
 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+        
 </head>
 
 <body>
@@ -47,28 +49,47 @@
     <main>
         <div class="agenda">
             <div class="div_control">
+                <div class="date-picker-container">
+                    <button id="prev-day">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M15 10L5 10M5 10L10 15M5 10L10 5" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+                    <input type="date" id="date-picker" class="date-picker">
+                    <button id="next-day">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <path d="M5 10L15 10M15 10L10 5M15 10L10 15" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </button>
+
+                    <div class="btn_ajd">
+                        <h4>Aujourd'hui</h4>
+                    </div>
+                </div>
             </div>
             <div class="div_jours">
                 <div class="div_jour_nom">
-                    <p>Lundi</p>
+                    <h4>Lundi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Mardi</p>
+                    <h4>Mardi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Mercredi</p>
+                    <h4>Mercredi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Jeudi</p>
+                    <h4>Jeudi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Vendredi</p>
+                    <h4>Vendredi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Samedi</p>
+                    <h4>Samedi</h4>
                 </div>
                 <div class="div_jour_nom">
-                    <p>Dimanche</p>
+                    <h4>Dimanche</h4>
                 </div>
             </div>
             <div class="div_agenda_ctrl">
@@ -147,73 +168,483 @@
                     </div>
                 </div>
                 <div class="div_agenda">
-                    <div class="div_jour">
-                        <div class="div_event" id="e1">
-
-                        </div>
-                        <div class="div_event" id="e2">
-
-                        </div>
-                        <div class="div_event" id="e3">
-
-                        </div>
-
-                    </div>
-                    <div class="div_jour" id="2">
-                        <div class="div_event" id="e1">
-
-                        </div>
-                    </div>
-                    <div class="div_jour"></div>
-                    <div class="div_jour"></div>
-                    <div class="div_jour"></div>
-                    <div class="div_jour"></div>
-                    <div class="div_jour"></div>
+                    <div class="div_jour" id="0"></div>
+                    <div class="div_jour" id="1"></div>
+                    <div class="div_jour" id="2"></div>
+                    <div class="div_jour" id="3"></div>
+                    <div class="div_jour" id="4"></div>
+                    <div class="div_jour" id="5"></div>
+                    <div class="div_jour" id="6"></div>
                 </div>
             </div>
         </div>
     </main>
+    <!-- <div class="div_popup"> -->
+        <!-- <div class="div_illustration">
+
+        </div>
+        <div class="div_title_event_pop">
+            <div class="div_color_parent">
+                <div class="div_color">
+
+                </div>
+            </div>
+            <div class="div_title_info_parent">
+                <h3 id="titre_event_pop" contenteditable="true">Coiffeur</h3>
+                <p id="heure_event_pop">Lundi 12:00 - 13:00</p>
+            </div>
+        </div>
+        <div class="div_description_parent_pop">
+            <div class="description_pop">
+                <h4>Description: </h4>
+                <p id="description_event_pop">Lorem ipsum dolor sit ametLorem ipsum dolor sit ametLorem ipsum dolor sit
+                    ametLorem ipsum dolor sit ametLorem ipsum dolor sit ametLorem ipsum dolor sit amet consectetur
+                    adipisicing elit. Quisquam, quod.</p>
+            </div>
+            <div class="localistion_pop">
+                <h4>Localisation: </h4>
+                <p id="localisation_event_pop">Salle A101</p>
+            </div>
+            <div class="groupe_pop">
+                <h4>Groupe: </h4>
+                <p id="groupe_event_pop">Coiffeur</p>
+            </div>
+
+        </div>
+        <div class="div_link_and_document_parent_pop">
+            <div class="document_link_pop">
+                <a href="#">Document 1</a>
+            </div>
+            <div class="link_pop">
+                <a href="#">Lien 1</a>
+            </div>
+        </div> -->
+    <!-- </div> -->
 </body>
-<script>
-    function addEvent(id, name, start, end, overlap_count, index, color) {
+<script type="module">
+    import { format, addDays, parseISO, differenceInDays } from 'https://cdn.jsdelivr.net/npm/date-fns@2.30.0/+esm';
+
+    const datePicker = document.getElementById("date-picker");
+    const prevDayButton = document.getElementById("prev-day");
+    const nextDayButton = document.getElementById("next-day");
+    const formattedDate = document.getElementById("formatted-date");
+    const btn_ajd = document.querySelector(".btn_ajd");
+
+
+    function close_event() {
+        let last_popup = document.querySelector('.div_popup');
+        if (last_popup) {
+            last_popup.remove();
+        }
+    }
+
+    function createPopupDiv(eventData,day) {
+        let last_popup = document.querySelector('.div_popup');
+        if (last_popup) {
+            last_popup.remove();
+        }
+
+        let popup = document.createElement('div');
+        popup.className = 'div_popup';
+
+        let divIllustration = document.createElement('div');
+        divIllustration.className = 'div_illustration';
+
+        let divTitleEvent = document.createElement('div');
+        divTitleEvent.className = 'div_title_event_pop';
+
+        let divColorParent = document.createElement('div');
+        divColorParent.className = 'div_color_parent';
+        let divColor = document.createElement('div');
+        divColor.className = 'div_color';
+        divColor.style.backgroundColor = eventData.color;
+        divColorParent.appendChild(divColor);
+
+        let divTitleInfo = document.createElement('div');
+        divTitleInfo.className = 'div_title_info_parent';
+        let h3Title = document.createElement('h3');
+        h3Title.id = 'titre_event_pop';
+        h3Title.contentEditable = 'true';
+        h3Title.textContent = eventData.title || 'Titre de l\'évènement';
+        let pTime = document.createElement('p');
+        pTime.id = 'heure_event_pop';
+
+        let start = eventData.startTime.split(':');
+        let end = eventData.endTime.split(':');
+        let jour_nom = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        let index = new Date(day).getDay();
+        let day_nom = jour_nom[index];
+
+
+        pTime.textContent = `${day_nom} ${start[0]}:${start[1]} - ${end[0]}:${end[1]}`;
+
+        divTitleInfo.append(h3Title, pTime);
+
+        divTitleEvent.append(divColorParent, divTitleInfo);
+
+        let divDescription = document.createElement('div');
+        divDescription.className = 'div_description_parent_pop';
+
+        let descriptionDiv = document.createElement('div');
+        descriptionDiv.className = 'description_pop';
+        let h4Desc = document.createElement('h4');
+        h4Desc.textContent = 'Description: ';
+        let pDesc = document.createElement('p');
+        pDesc.id = 'description_event_pop';
+        pDesc.textContent = eventData.description || 'No description available';
+        if (eventData.description) {
+            descriptionDiv.append(h4Desc, pDesc);
+            divDescription.append(descriptionDiv);
+        }
+
+        let locationDiv = document.createElement('div');
+        locationDiv.className = 'localistion_pop';
+        let h4Loc = document.createElement('h4');
+        h4Loc.textContent = 'Localisation: ';
+        let pLoc = document.createElement('p');
+        pLoc.id = 'localisation_event_pop';
+        pLoc.textContent = eventData.location || 'No location specified';
+        if (eventData.location) {
+            locationDiv.append(h4Loc, pLoc);
+            divDescription.append(locationDiv);
+        }
+
+        let groupDiv = document.createElement('div');
+        groupDiv.className = 'groupe_pop';
+        let h4Group = document.createElement('h4');
+        h4Group.textContent = 'Groupe: ';
+        let pGroup = document.createElement('p');
+        pGroup.id = 'groupe_event_pop';
+        pGroup.textContent = eventData.group || 'No group specified';
+        if (eventData.group) {
+            groupDiv.append(h4Group, pGroup);
+            divDescription.append(groupDiv);
+        }
+
+        let divLinks = document.createElement('div');
+        divLinks.className = 'div_link_and_document_parent_pop';
+        
+        for (let i = 0; i < eventData.linkedItems.notes.length; i++) {
+            let docLink = document.createElement('div');
+            docLink.className = 'document_link_pop';
+            let aDoc = document.createElement('a');
+            aDoc.href = '#' + eventData.linkedItems.notes[i];
+            aDoc.textContent = `Document ${i + 1}`;
+            docLink.appendChild(aDoc);
+            divLinks.appendChild(docLink);
+        }
+
+        for (let i = 0; i < eventData.linkedItems.sections.length; i++) {
+            let linkDiv = document.createElement('div');
+            linkDiv.className = 'link_pop';
+            let aLink = document.createElement('a');
+            aLink.href = '#'+eventData.linkedItems.sections[i];
+            aLink.textContent = `Lien ${i + 1}`;
+            linkDiv.appendChild(aLink);
+            divLinks.appendChild(linkDiv);
+        }
+
+        popup.append(divIllustration, divTitleEvent, divDescription, divLinks);
+        
+        return popup;
+    }
+
+    function addEvent(id, name, start, end, overlap_count, index, color, data,day) {
         let event = document.createElement("div");
-        let isclick = false;
+
+        let titre = document.createElement("h3");
+        titre.innerHTML = name;
+        titre.className = "titre_event";
+
+        let heure = document.createElement("p");
+        heure.innerHTML = `${data.startTime} - ${data.endTime}`;
+        heure.className = "heure_event";
 
 
         event.id = id;
         event.className = "div_event";
-        event.innerHTML = name;
         event.style.backgroundColor = color;
         event.style.height = `calc((${end} - ${start}) * 40px)`;
         event.style.top = `calc(${start} * 40px)`;
-        event.style.left = `calc((100% / ${overlap_count}) * ${index} - 2.5px)`;
+        event.style.left = `calc((100% / ${overlap_count}) * ${index} - ${(index + 1) * 2.5}px)`;
         event.style.width = `calc(100% / ${overlap_count} - 2.5px)`;
 
-        let initialY = 0;
-        event.addEventListener("mousedown", function (e) {
-            isclick = true;
-            initialY = e.clientY - event.offsetTop;
-        });
-        event.addEventListener("mouseup", function () {
-            isclick = false;
-        });
-        document.addEventListener("mousemove", function (e) {
-            if (isclick) {
-                let newTop = e.clientY - initialY;
-                newTop = newTop/10;
-                newTop = Math.round(newTop) * 10;
-                event.style.top = `${newTop}px`;
+        event.setAttribute("data", [start, end, overlap_count, index].join(","));
 
-                let div_jour = document.querySelector(".div_jour");
-                let div_jour_pos = div_jour.getBoundingClientRect();
+        event.appendChild(titre);
+        event.appendChild(heure);
 
+        event.addEventListener("click", (e) => {
+            let pop = createPopupDiv(data,day);
+            document.body.appendChild(pop);
+            pop.style.display = 'flex';
+
+            let event_posi = event.getBoundingClientRect();
+            let pop_posi = pop.getBoundingClientRect();
+            if (event_posi.top + pop_posi.height + event_posi.height> window.innerHeight-200) {
+                pop.style.top = `${event_posi.top - pop_posi.height}px`;
+            } else {
+                pop.style.top = `${event_posi.bottom}px`;
             }
+            
+
+            if (event_posi.left + event_posi.width + pop_posi.width > window.innerWidth) {
+                pop.style.left = `${event_posi.left - pop_posi.width}px`;
+            } else{
+                pop.style.left = `${event_posi.right}px`;
+            }
+
         });
+        event.addEventListener("dblclick", () => {
+            close_event(event);
+        });
+
 
         return event;
     }
 
-    document.getElementById("2").appendChild(addEvent("e4", "Event 1", 2, 10, 1, 0, "red"));
+    function convert_hours_to_int(hours) {
+        let [hour, minute] = hours.split(":");
+        return parseInt(hour) + parseInt(minute) / 60;
+    }
+
+    function convert_int_to_hours(int_hour) {
+        let hour = Math.floor(int_hour);
+        let minute = Math.round((int_hour - hour) * 60);
+        return `${hour}:${minute}`;
+    }
+
+    function clean_agenda() {
+        let day_week_div = document.getElementsByClassName("div_jour");
+        for (let i = 0; i < day_week_div.length; i++) {
+            day_week_div[i].innerHTML = "";
+        }
+        let div_jour_nom = document.getElementsByClassName("div_jour_nom");
+        for (let i = 0; i < div_jour_nom.length; i++) {
+            // remove only p element
+            div_jour_nom[i].querySelectorAll("p").forEach(e => e.remove());
+
+        }
+    }
+
+    function add_cursor_of_the_hours() {
+        // supprimer les div_heures	
+        let div_heures = document.getElementsByClassName("div_cursor");
+        for (let i = 0; i < div_heures.length; i++) {
+            div_heures[i].remove();
+        }
+
+        let div = document.createElement("div");
+        div.className = "div_cursor";
+
+        function updatePosition() {
+            let date = new Date();
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+            let start = hour + minute / 60;
+            div.style.top = `calc(${start} * 40px)`;
+            console.log(start);
+        }
+
+        // Initial position
+        updatePosition();
+
+        // Update position every minute
+        setInterval(updatePosition, 60000);
+
+        return div;
+    }
+
+    function load_agenda_week(any_date_from_the_week,json_struc) {
+        clean_agenda();
+
+        any_date_from_the_week = parseISO(any_date_from_the_week);
+        let data_day = format(any_date_from_the_week, 'yyyy-MM-dd');
+
+        let data_monday_of_the_week = addDays(any_date_from_the_week, - ((any_date_from_the_week.getDay() + 6) % 7));
+        data_monday_of_the_week = format(data_monday_of_the_week, 'yyyy-MM-dd');
+
+        let day_week_div = document.getElementsByClassName("div_jour");
+        let div_jour_nom = document.getElementsByClassName("div_jour_nom");
+        for (let i = 0; i < day_week_div.length; i++) {
+            let day = addDays(parseISO(data_monday_of_the_week), i);
+            day = format(day, 'yyyy-MM-dd');
+            day_week_div[i].setAttribute("date", day);
+            let p = document.createElement("p");
+            p.innerHTML = format(parseISO(day), 'dd/MM/yyyy');
+            div_jour_nom[i].appendChild(p);
+            
+            day_week_div[i].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+            
+            if (day == data_day) {
+                day_week_div[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+            }
+            
+            console.log(json_struc);
+            console.log(day);
+            let data = json_struc[day];
+            if (data == undefined) {
+                continue;
+            }
+            console.log(day);
+            // document.getElementById("2").appendChild(addEvent("e4", "Event 1", 2, 10, 1, 0, "red"));
+            let index = 0;
+            data.forEach(event => {
+                // verifier si si il se cheuvoche avec 1 ou plusiuer autres evènement de la meme journée
+
+                let overlapping_events = [];
+
+                // Check each event against the current one for overlap
+                data.forEach(other_event => {
+                    let current_start = convert_hours_to_int(event.startTime);
+                    let current_end = convert_hours_to_int(event.endTime);
+                    let other_start = convert_hours_to_int(other_event.startTime);
+                    let other_end = convert_hours_to_int(other_event.endTime);
+
+                    if (current_start < other_end && current_end > other_start) {
+                        overlapping_events.push(other_event);
+                    }
+                });
+
+                let overlap_count = overlapping_events.length || 1;
+                index = overlapping_events.indexOf(event);
+
+                let start = convert_hours_to_int(event.startTime);
+                let end = convert_hours_to_int(event.endTime);
+                // let overlap_count = data.length;
+                let color = event.color;
+                day_week_div[i].appendChild(addEvent(event.id, event.title, start, end, overlap_count, index, color, event,day));
+                index++;
+            });
+
+        }
+        // today
+        let today = new Date();
+        let todayDay = today.getDay();
+
+        let parent = document.getElementById(todayDay - 1);
+
+        let div_cursor = add_cursor_of_the_hours();
+        console.log(div_cursor);
+        parent.appendChild(div_cursor);
+
+
+    }
+
+    // Fonction pour afficher la date formatée
+    async function updateFormattedDate() {
+        let json_struc = await get_agenda();
+        const selectedDate = new Date(datePicker.value);
+        load_agenda_week(datePicker.value,json_struc.events);
+    }
+
+    // Gérer les clics sur les boutons
+    prevDayButton.addEventListener("click", () => {
+        const selectedDate = new Date(datePicker.value);
+        const newDate = addDays(selectedDate, -1);
+        datePicker.value = newDate.toISOString().split("T")[0];
+        updateFormattedDate();
+    });
+
+    nextDayButton.addEventListener("click", () => {
+        const selectedDate = new Date(datePicker.value);
+        const newDate = addDays(selectedDate, 1);
+        datePicker.value = newDate.toISOString().split("T")[0];
+        updateFormattedDate();
+    });
+
+    btn_ajd.addEventListener("click", () => {
+        const today = new Date();
+        datePicker.value = today.toISOString().split("T")[0];
+        updateFormattedDate();
+    });
+
+    document.addEventListener("click", (e) => {
+        if (e.target.closest('.div_popup') == null && e.target.closest('.div_event') == null) {
+            close_event();
+        }
+    });
+    document.addEventListener("wheel", (e) => {
+        close_event();
+    });
+    // Mettre à jour lors du changement manuel
+    datePicker.addEventListener("change", updateFormattedDate);
+
+
+    //     "agenda": {
+    //         "2025-01-13": [
+    //             {
+    //                 "id": "1",
+    //                 "title": "Mathématiques",
+    //                 "startTime": "08:00",
+    //                 "endTime": "10:00",
+    //                 "group": "Maths",
+    //                 "color": "red",
+    //                 "linkedItems": {
+    //                     "notes": ["note1", "note2"],
+    //                     "sections": ["section1", "section2"]
+    //                 },
+    //                 "location": "Salle A101",
+    //                 "description": "Cours sur les intégrales"
+    //             },
+    //             {
+    //                 "id": "2",
+    //                 "title": "Philosophie",
+    //                 "startTime": "9:30",
+    //                 "endTime": "12:00",
+    //                 "group": "Philo",
+    //                 "color": "blue",
+    //                 "linkedItems": {
+    //                     "notes": ["note3"],
+    //                     "sections": ["section3"]
+    //                 },
+    //                 "location": "Salle B202",
+    //                 "description": "Débat sur la liberté"
+    //             },
+    //             {
+    //                 "id": "3",
+    //                 "title": "Histoire",
+    //                 "startTime": "8:30",
+    //                 "endTime": "13:00",
+    //                 "color": "green",
+    //                 "linkedItems": {
+    //                     "notes": ["note3"],
+    //                     "sections": ["section3"]
+    //                 },
+    //                 "description": "Débat sur la liberté"
+    //             }
+    //         ],
+    //         "2025-01-18": [
+    //             {
+    //                 "id": "3",
+    //                 "title": "Physique",
+    //                 "startTime": "09:00",
+    //                 "endTime": "11:00",
+    //                 "group": "Physique",
+    //                 "color": "red",
+    //                 "linkedItems": {
+    //                     "notes": ["note4"],
+    //                     "sections": []
+    //                 },
+    //                 "location": "Laboratoire",
+    //                 "description": "Travaux pratiques sur l'électricité"
+    //             }
+    //         ]
+    //     }
+    // }
+
+    // Initialiser la date à aujourd'hui
+    const today = new Date();
+    datePicker.value = today.toISOString().split("T")[0];
+    updateFormattedDate();
+
+
+    async function get_agenda() {
+        let response = await fetch('/agenda_events');
+        let data = await response.json();
+        return data;
+    }
+
 </script>
 
 </html>
