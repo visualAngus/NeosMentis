@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-        
+
 </head>
 
 <body>
@@ -179,7 +179,7 @@
             </div>
         </div>
     </main>
-    <!-- <div class="div_popup"> -->
+    <div class="div_popup">
         <!-- <div class="div_illustration">
 
         </div>
@@ -218,7 +218,7 @@
             <div class="link_pop">
                 <a href="#">Lien 1</a>
             </div>
-        </div> -->
+        </div>
     <!-- </div> -->
 </body>
 <script type="module">
@@ -237,8 +237,15 @@
             last_popup.remove();
         }
     }
+    function close_event_div_add_event() {
+        let last_popup = document.querySelector('.div_popup_add_event');
+        if (last_popup) {
+            last_popup.remove();
+        }
+    }
 
-    function createPopupDiv(eventData,day) {
+    function createPopupDiv(eventData, day) {
+        close_event_div_add_event();
         let last_popup = document.querySelector('.div_popup');
         if (last_popup) {
             last_popup.remove();
@@ -269,14 +276,14 @@
         let pTime = document.createElement('p');
         pTime.id = 'heure_event_pop';
 
-        let start = eventData.startTime.split(':');
-        let end = eventData.endTime.split(':');
+        let start = get_only_time(eventData.startTime);
+        let end = get_only_time(eventData.endTime);
         let jour_nom = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
         let index = new Date(day).getDay();
         let day_nom = jour_nom[index];
 
 
-        pTime.textContent = `${day_nom} ${start[0]}:${start[1]} - ${end[0]}:${end[1]}`;
+        pTime.textContent = `${day_nom} ${start} - ${end}`;
 
         divTitleInfo.append(h3Title, pTime);
 
@@ -323,7 +330,7 @@
 
         let divLinks = document.createElement('div');
         divLinks.className = 'div_link_and_document_parent_pop';
-        
+
         for (let i = 0; i < eventData.linkedItems.notes.length; i++) {
             let docLink = document.createElement('div');
             docLink.className = 'document_link_pop';
@@ -338,18 +345,41 @@
             let linkDiv = document.createElement('div');
             linkDiv.className = 'link_pop';
             let aLink = document.createElement('a');
-            aLink.href = '#'+eventData.linkedItems.sections[i];
+            aLink.href = '#' + eventData.linkedItems.sections[i];
             aLink.textContent = `Lien ${i + 1}`;
             linkDiv.appendChild(aLink);
             divLinks.appendChild(linkDiv);
         }
 
+        let btn_add = document.createElement('button');
+        btn_add.className = 'btn_add';
+        btn_add.textContent = 'Supprimer';
+
+        btn_add.addEventListener("click", () => {
+            let id = eventData.id;
+            // enlever les 2 premiers caractères
+            id = id.slice(2);
+            fetch('agenda/delete_agenda_event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            }).then(res => {
+                if (res.status == 200) {
+                    close_event();
+                    updateFormattedDate();
+                }
+            });
+        });
+
+        divLinks.appendChild(btn_add);
         popup.append(divIllustration, divTitleEvent, divDescription, divLinks);
-        
+
         return popup;
     }
 
-    function addEvent(id, name, start, end, overlap_count, index, color, data,day) {
+    function addEvent(id, name, start, end, overlap_count, index, color, data, day) {
         let event = document.createElement("div");
 
         let titre = document.createElement("h3");
@@ -357,7 +387,11 @@
         titre.className = "titre_event";
 
         let heure = document.createElement("p");
-        heure.innerHTML = `${data.startTime} - ${data.endTime}`;
+        let start_time = get_only_time(data.startTime);
+        let end_time = get_only_time(data.startTime);
+
+        console.log(start_time, end_time);
+        heure.innerHTML = `${start_time} - ${end_time}`;
         heure.className = "heure_event";
 
 
@@ -375,22 +409,22 @@
         event.appendChild(heure);
 
         event.addEventListener("click", (e) => {
-            let pop = createPopupDiv(data,day);
+            let pop = createPopupDiv(data, day);
             document.body.appendChild(pop);
             pop.style.display = 'flex';
 
             let event_posi = event.getBoundingClientRect();
             let pop_posi = pop.getBoundingClientRect();
-            if (event_posi.top + pop_posi.height + event_posi.height> window.innerHeight-200) {
+            if (event_posi.top + pop_posi.height + event_posi.height > window.innerHeight - 200) {
                 pop.style.top = `${event_posi.top - pop_posi.height}px`;
             } else {
                 pop.style.top = `${event_posi.bottom}px`;
             }
-            
+
 
             if (event_posi.left + event_posi.width + pop_posi.width > window.innerWidth) {
                 pop.style.left = `${event_posi.left - pop_posi.width}px`;
-            } else{
+            } else {
                 pop.style.left = `${event_posi.right}px`;
             }
 
@@ -408,10 +442,21 @@
         return parseInt(hour) + parseInt(minute) / 60;
     }
 
+    function get_only_date(date) {
+        return date.split("T")[0];
+    }
+
+    function get_only_time(date) {
+        return date.split("T")[1].split(":").slice(0,2).join(":");
+    }
+
+    function convert_hours_into_int_from_date(date) {
+        let [hour, minute] = date.split(":");
+        return parseInt(hour) + parseInt(minute) / 60;
+    }
+
     function convert_int_to_hours(int_hour) {
-        let hour = Math.floor(int_hour);
-        let minute = Math.round((int_hour - hour) * 60);
-        return `${hour}:${minute}`;
+        return int_hour.toString().padStart(2, '0') + ':00';
     }
 
     function clean_agenda() {
@@ -443,7 +488,6 @@
             let minute = date.getMinutes();
             let start = hour + minute / 60;
             div.style.top = `calc(${start} * 40px)`;
-            console.log(start);
         }
 
         // Initial position
@@ -455,8 +499,228 @@
         return div;
     }
 
-    function load_agenda_week(any_date_from_the_week,json_struc) {
+    function open_add_event_popup(day, start, end) {
+        close_event_div_add_event();
+        close_event();
+
+        let popup = document.createElement('div');
+        popup.className = 'div_popup_add_event';
+
+        let divIllustration = document.createElement('div');
+        divIllustration.className = 'div_illustration';
+
+        let divTitleEvent = document.createElement('div');
+        divTitleEvent.className = 'div_title_event_pop';
+
+        let divColorParent = document.createElement('div');
+        divColorParent.className = 'div_color_parent';
+        let divColor = document.createElement('div');
+        divColor.className = 'div_color';
+        divColor.style.backgroundColor = "red";
+        divColorParent.appendChild(divColor);
+
+        let divTitleInfo = document.createElement('div');
+        divTitleInfo.className = 'div_title_info_parent';
+        let h3Title = document.createElement('input');
+        h3Title.id = 'titre_event_pop_add';
+        h3Title.type = 'text';
+        h3Title.placeholder = 'Titre de l\'évènement';
+
+        let parent_time = document.createElement('div');
+        parent_time.className = 'parent_time_start';
+
+        let span = document.createElement('span');
+        span.textContent = 'Start : ';
+        span.id = 'date_heure_event_pop_add';
+
+        let inputDate_start = document.createElement('input');
+        inputDate_start.type = 'date';
+        inputDate_start.width = '20%';
+        inputDate_start.id = 'date_event_pop_add';
+        inputDate_start.value = day;
+
+        let inputTime_start = document.createElement('input');
+        inputTime_start.type = 'time';
+        inputTime_start.width = '20%';
+        inputTime_start.id = 'heure_event_pop_add';
+        inputTime_start.value = start;
+
+        parent_time.appendChild(span);
+        parent_time.appendChild(inputDate_start);
+        parent_time.appendChild(inputTime_start);
+
+        divTitleInfo.append(h3Title, parent_time);
+
+
+        parent_time = document.createElement('div');
+        parent_time.className = 'parent_time_end';
+
+        span = document.createElement('span');
+        span.textContent = 'End : ';
+        span.id = 'date_heure_event_pop_add';
+
+        let inputDate_end = document.createElement('input');
+        inputDate_end.type = 'date';
+        inputDate_end.width = '20%';
+        inputDate_end.id = 'date_event_pop_add';
+        inputDate_end.value = day;
+
+        let inputTime_end = document.createElement('input');
+        inputTime_end.type = 'time';
+        inputTime_end.width = '20%';
+        inputTime_end.id = 'heure_event_pop_add';
+        inputTime_end.value = end;
+
+        parent_time.appendChild(span);
+        parent_time.appendChild(inputDate_end);
+        parent_time.appendChild(inputTime_end);
+
+
+        divTitleInfo.append(parent_time);
+
+        divTitleEvent.append(divColorParent, divTitleInfo);
+
+        let divDescription = document.createElement('div');
+        divDescription.className = 'div_description_parent_pop';
+
+        let descriptionDiv = document.createElement('div');
+        descriptionDiv.className = 'description_pop';
+        let h4Desc = document.createElement('h4');
+        h4Desc.textContent = 'Description: ';
+        let pDesc = document.createElement('input');
+        pDesc.id = 'description_event_pop_add';
+        pDesc.type = 'text';
+        pDesc.placeholder = 'Description...';
+        descriptionDiv.append(h4Desc, pDesc);
+        divDescription.append(descriptionDiv);
+
+        let locationDiv = document.createElement('div');
+        locationDiv.className = 'localistion_pop';
+        let h4Loc = document.createElement('h4');
+        h4Loc.textContent = 'Localisation: ';
+        let pLoc = document.createElement('input');
+        pLoc.id = 'localisation_event_pop_add';
+        pLoc.type = 'text';
+        pLoc.placeholder = 'Localisation...';
+        locationDiv.append(h4Loc, pLoc);
+        divDescription.append(locationDiv);
+
+        let groupDiv = document.createElement('div');
+        groupDiv.className = 'groupe_pop';
+        let h4Group = document.createElement('h4');
+        h4Group.textContent = 'Groupe: ';
+        let pGroup = document.createElement('select');
+        pGroup.id = 'groupe_event_pop_add';
+
+        let option = document.createElement('option');
+        option.value = 'Maths';
+        option.textContent = 'Maths';
+        pGroup.appendChild(option);
+
+        option = document.createElement('option');
+        option.value = 'Philo';
+        option.textContent = 'Philo';
+        pGroup.appendChild(option);
+
+
+
+        groupDiv.append(h4Group, pGroup);
+        divDescription.append(groupDiv);
+
+        let divLinks = document.createElement('div');
+        divLinks.className = 'div_link_and_document_parent_pop';
+
+        // for (let i = 0; i < eventData.linkedItems.notes.length; i++) {
+        //     let docLink = document.createElement('div');
+        //     docLink.className = 'document_link_pop';
+        //     let aDoc = document.createElement('a');
+        //     aDoc.href = '#' + eventData.linkedItems.notes[i];
+        //     aDoc.textContent = `Document ${i + 1}`;
+        //     docLink.appendChild(aDoc);
+        //     divLinks.appendChild(docLink);
+        // }
+
+        // for (let i = 0; i < eventData.linkedItems.sections.length; i++) {
+        //     let linkDiv = document.createElement('div');
+        //     linkDiv.className = 'link_pop';
+        //     let aLink = document.createElement('a');
+        //     aLink.href = '#'+eventData.linkedItems.sections[i];
+        //     aLink.textContent = `Lien ${i + 1}`;
+        //     linkDiv.appendChild(aLink);
+        //     divLinks.appendChild(linkDiv);
+        // }
+
+        let btn_add = document.createElement('button');
+        btn_add.className = 'btn_add';
+        btn_add.textContent = 'Ajouter';
+
+        btn_add.addEventListener("click", () => {
+            let id = "";
+            let title = h3Title.value;
+            let description = pDesc.value;
+            let location = pLoc.value;
+            let group = pGroup.value;
+
+
+            let startDate = inputDate_start.value + 'T' + inputTime_start.value;
+            let endDate = inputDate_end.value + 'T' + inputTime_end.value;
+            let linkedItems = {
+                notes: [],
+                sections: []
+            };
+            let color = 'red';
+
+            let data = {
+                id,
+                title,
+                description,
+                location,
+                group,
+                startDate,
+                endDate,
+                linkedItems,
+                color
+            };
+            add_new_event_base(data).then(res => {
+                if (res.status == 200) {
+                    close_event_div_add_event();
+                    updateFormattedDate();
+                }
+            });
+
+
+        });
+
+        divLinks.appendChild(btn_add);
+
+
+        popup.append(divIllustration, divTitleEvent, divDescription, divLinks);
+        return popup;
+    }
+
+    async function add_new_event_base(data) {
+        return await fetch('agenda/save_agenda_event', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+    }
+
+    function load_agenda_week(any_date_from_the_week, json_struc) {
         clean_agenda();
+
+        // get url params
+        let urlParams = new URLSearchParams(window.location.search);
+        let search_params = urlParams.get('date');
+        if (search_params) {
+            console.log(search_params);
+            any_date_from_the_week = search_params;
+            datePicker.value = any_date_from_the_week;
+            // remove the param from the url mais garder la page
+            window.history.pushState({}, document.title, window.location.pathname);
+        }
 
         any_date_from_the_week = parseISO(any_date_from_the_week);
         let data_day = format(any_date_from_the_week, 'yyyy-MM-dd');
@@ -473,20 +737,72 @@
             let p = document.createElement("p");
             p.innerHTML = format(parseISO(day), 'dd/MM/yyyy');
             div_jour_nom[i].appendChild(p);
-            
+
             day_week_div[i].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
-            
+
             if (day == data_day) {
                 day_week_div[i].style.backgroundColor = "rgba(0, 0, 0, 0.1)";
             }
-            
-            console.log(json_struc);
-            console.log(day);
+            day_week_div[i].addEventListener("mousemove", (e) => {
+                if (document.querySelector(".div_popup_add_event")) {
+                    return;
+                }
+
+                let y_pos = day_week_div[i].getBoundingClientRect().top;
+
+                let cursor_posi = e.clientY;
+                let cursor_posi_relative = cursor_posi - y_pos;
+                let cursor_posi_relative_hour = cursor_posi_relative / 40;
+                let cursor_posi_relative_hour_round = Math.round(cursor_posi_relative_hour);
+                let cursor_posi_relative_hour_round_int = Math.floor(cursor_posi_relative_hour);
+                cursor_posi_relative_hour = cursor_posi_relative_hour_round_int * 40
+
+                let hours = convert_int_to_hours(cursor_posi_relative_hour_round_int);
+                let hours_plus = convert_int_to_hours(cursor_posi_relative_hour_round_int + 1);
+
+                let div_add_event_ = document.querySelector(".div_add_event");
+                if (div_add_event_) {
+                    div_add_event_.remove();
+                }
+                let div_add_event = document.createElement("div");
+                div_add_event.className = "div_add_event";
+                div_add_event.style.top = `${cursor_posi_relative_hour}px`;
+
+                div_add_event.addEventListener("click", (e) => {
+                    let pop = open_add_event_popup(day, hours, hours_plus);
+                    document.body.appendChild(pop);
+                    pop.style.display = 'flex';
+                    pop.style.left = `${e.clientX}px`;
+
+                    let event_posi = div_add_event.getBoundingClientRect();
+                    let pop_posi = pop.getBoundingClientRect();
+
+                    if (event_posi.top + pop_posi.height + event_posi.height > window.innerHeight - 200) {
+                        pop.style.top = `${event_posi.top - pop_posi.height}px`;
+                    } else {
+                        pop.style.top = `${event_posi.bottom}px`;
+                    }
+
+
+                    if (event_posi.left + event_posi.width + pop_posi.width > window.innerWidth) {
+                        pop.style.left = `${event_posi.left - pop_posi.width}px`;
+                    } else {
+                        pop.style.left = `${event_posi.right}px`;
+                    }
+
+                });
+                div_add_event.addEventListener("dblclick", () => {
+                    close_event_div_add_event();
+                });
+
+
+                day_week_div[i].appendChild(div_add_event);
+
+            });
             let data = json_struc[day];
             if (data == undefined) {
                 continue;
             }
-            console.log(day);
             // document.getElementById("2").appendChild(addEvent("e4", "Event 1", 2, 10, 1, 0, "red"));
             let index = 0;
             data.forEach(event => {
@@ -495,11 +811,11 @@
                 let overlapping_events = [];
 
                 // Check each event against the current one for overlap
+                let current_start = convert_hours_into_int_from_date(get_only_time(event.startTime));
+                let current_end = convert_hours_into_int_from_date(get_only_time(event.endTime));
                 data.forEach(other_event => {
-                    let current_start = convert_hours_to_int(event.startTime);
-                    let current_end = convert_hours_to_int(event.endTime);
-                    let other_start = convert_hours_to_int(other_event.startTime);
-                    let other_end = convert_hours_to_int(other_event.endTime);
+                    let other_start = convert_hours_into_int_from_date(get_only_time(other_event.startTime));
+                    let other_end = convert_hours_into_int_from_date(get_only_time(other_event.endTime));
 
                     if (current_start < other_end && current_end > other_start) {
                         overlapping_events.push(other_event);
@@ -509,11 +825,12 @@
                 let overlap_count = overlapping_events.length || 1;
                 index = overlapping_events.indexOf(event);
 
-                let start = convert_hours_to_int(event.startTime);
-                let end = convert_hours_to_int(event.endTime);
+                let start = convert_hours_into_int_from_date(get_only_time(event.startTime));
+                let end = convert_hours_into_int_from_date(get_only_time(event.endTime));
+
                 // let overlap_count = data.length;
                 let color = event.color;
-                day_week_div[i].appendChild(addEvent(event.id, event.title, start, end, overlap_count, index, color, event,day));
+                day_week_div[i].appendChild(addEvent(event.id, event.title, start, end, overlap_count, index, color, event, day));
                 index++;
             });
 
@@ -525,7 +842,6 @@
         let parent = document.getElementById(todayDay - 1);
 
         let div_cursor = add_cursor_of_the_hours();
-        console.log(div_cursor);
         parent.appendChild(div_cursor);
 
 
@@ -535,7 +851,7 @@
     async function updateFormattedDate() {
         let json_struc = await get_agenda();
         const selectedDate = new Date(datePicker.value);
-        load_agenda_week(datePicker.value,json_struc.events);
+        load_agenda_week(datePicker.value, json_struc.events);
     }
 
     // Gérer les clics sur les boutons
@@ -560,12 +876,15 @@
     });
 
     document.addEventListener("click", (e) => {
-        if (e.target.closest('.div_popup') == null && e.target.closest('.div_event') == null) {
+        if (e.target.closest('.div_popup') == null && e.target.closest('.div_event') == null && e.target.closest('.div_add_event') == null && e.target.closest('.div_popup_add_event') == null) {
             close_event();
+            close_event_div_add_event();
         }
     });
     document.addEventListener("wheel", (e) => {
         close_event();
+        close_event_div_add_event();
+
     });
     // Mettre à jour lors du changement manuel
     datePicker.addEventListener("change", updateFormattedDate);
@@ -640,8 +959,9 @@
 
 
     async function get_agenda() {
-        let response = await fetch('/agenda_events');
+        let response = await fetch('agenda/agenda_events');
         let data = await response.json();
+        console.log(data);
         return data;
     }
 

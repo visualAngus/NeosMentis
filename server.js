@@ -11,7 +11,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const WebSocket = require('ws');
 const http = require('http');
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid'); 
 
 
 // Clé secrète pour signer les tokens JWT
@@ -96,6 +96,14 @@ app.get('/agenda', (req, res) => {
     }
 
     res.sendFile('./public/html/agenda.html', { root: __dirname })
+});
+app.get('/carte', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    res.sendFile('./public/html/carte.html', { root: __dirname })
 });
 
 app.post('/uploadFile', upload.single('file'), (req, res) => {
@@ -434,20 +442,19 @@ app.get('/logout', (req, res) => {
 });
 
 
-app.get('/agenda_events', (req, res) => {
+app.get('/agenda/agenda_events', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
 
-    connection.query("SELECT * FROM agenda_events WHERE user_id_link = ?", [data.userID], (error, results) => {
+    connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ?", [data.userID], (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
-        console.log("results:", results);
         // Group events by date
         const groupedEvents = results.reduce((acc, event) => {
-            const date = event.date_event.toISOString().split('T')[0];
+            const date = event.startTime.toISOString().split('T')[0];
             if (!acc[date]) {
                 acc[date] = [];
             }
@@ -468,34 +475,31 @@ app.get('/agenda_events', (req, res) => {
     });
 });
 
-app.post('/save_agenda_event', (req, res) => {
+app.post('/agenda/save_agenda_event', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
-
     const id = req.body.id;
     const title = req.body.title;
-    const date = req.body.date;
-    const startTime = req.body.startTime;
-    const endTime = req.body.endTime;
+    const startDate= req.body.startDate;
+    const endDate = req.body.endDate;
     const group = req.body.group;
     const color = req.body.color;
     const linkedItems = JSON.stringify(req.body.linkedItems);
     const location = req.body.location;
     const description = req.body.description;
-
     if (id) {
-        connection.query("UPDATE agenda_events SET title = ?, date_event = ?, startTime = ?, endTime = ?, group_id_link = ?, color = ?, linkedItems = ?, location = ?, description = ? WHERE id_event = ? AND user_id_link = ?",
-            [title, date, startTime, endTime, group, color, linkedItems, location, description, id, data.userID], (error, _results) => {
+        connection.query("UPDATE agenda_events SET title = ?, startTime = ?, endTime = ?, group_id_link = ?, color = ?, linkedItems = ?, location = ?, description = ? WHERE id_event = ? AND user_id_link = ?",
+            [title, startDate, endDate, group, color, linkedItems, location, description, id, data.userID], (error, _results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
             return res.json({ success: true, message: 'Event updated successfully' });
         });
     } else {
-        connection.query("INSERT INTO agenda_events (title, date_event, startTime, endTime, group_id_link, color, linkedItems, location, description, user_id_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [title, date, startTime, endTime, group, color, linkedItems, location, description, data.userID], (error, _results) => {
+        connection.query("INSERT INTO agenda_events (title, startTime, endTime, group_id_link, color, linkedItems, location, description, user_id_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [title, startDate, endDate, group, color, linkedItems, location, description, data.userID], (error, _results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
@@ -504,7 +508,40 @@ app.post('/save_agenda_event', (req, res) => {
     }
 });
 
+app.post('/agenda/delete_agenda_event', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id = req.body.id;
+    connection.query("DELETE FROM agenda_events WHERE id_event = ? AND user_id_link = ?", [id, data.userID], (error, _results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, message: 'Event deleted successfully' });
+    });
+});
 
+app.get('/agenda/2weeks', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+    }
+    let currentDate = new Date();
+    currentDate.setHours(0, 1, 0, 0);
+    currentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+    let twoWeeksLater = new Date();
+    twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+    twoWeeksLater.setHours(23, 59, 59, 999);
+    twoWeeksLater = twoWeeksLater.toISOString().slice(0, 19).replace('T', ' ');
+
+    connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND startTime BETWEEN ? AND ? ORDER BY startTime",
+        [data.userID, currentDate, twoWeeksLater], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, events: results });
+    });
+});
 
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);

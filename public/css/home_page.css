@@ -341,3 +341,43 @@ main{
 #delete:hover{
     background-color: var(--soft-rouge);
 }
+
+
+/* agenda */
+.event_in_groupe{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 20px;
+    border-radius: 20px;
+
+    background-color: var(--bg-color);
+
+    box-shadow: 12px 12px 14px 0px var(--noir-shadow), inset 100px 100px 100px -100px var(--soft-vert-shadow);
+    user-select: none;
+
+    cursor: pointer;
+    transition: all var(--transition);
+
+    color: var(--gris);
+}
+.event_in_groupe h3{
+    font-size: 1.52em;
+    font-weight: 800;
+    font-style: normal;
+    white-space: nowrap;
+    overflow: auto;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    color: var(--gris);
+
+    margin-bottom: 10px;
+}
+.Agenda .event_in_groupe{
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}

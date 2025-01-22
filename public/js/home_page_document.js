@@ -196,9 +196,9 @@ function add_document(parent, title, id, add_div,date) {
     }
 }
 
-function create_document_groupe() {
+function create_document_groupe(titre, id) {
     const div_content = document.createElement('div');
-    div_content.classList.add('div_event', 'green', 'document');
+    div_content.classList.add('div_event', 'green', 'document', titre);
 
     const div_header = document.createElement('div');
     div_header.classList.add('div_header_event');
@@ -230,8 +230,8 @@ function create_document_groupe() {
             div_content.style.transform = `translate(${x}px, ${y}px)`;
 
             const actuel_settings = JSON.parse(localStorage.getItem('home_settings')) || {};
-            actuel_settings.document = actuel_settings.document || {};
-            actuel_settings.document.position = { x, y };
+            actuel_settings.document[id] = actuel_settings.document[id] || {};
+            actuel_settings.document[id].position = { x, y };
             localStorage.setItem('home_settings', JSON.stringify(actuel_settings));
 
             save_user_settings();
@@ -284,9 +284,13 @@ function create_document_groupe() {
             div_snap.style.backgroundColor = 'transparent';
 
             const actuel_settings = JSON.parse(localStorage.getItem('home_settings')) || {};
+
             actuel_settings.document = actuel_settings.document || {};
-            actuel_settings.document.snap = div_snap.id;
+            actuel_settings.document[id] = actuel_settings.document[id] || {};
+            actuel_settings.document[id].position = div_snap_position;
+            actuel_settings.document[id].snap = div_snap.id;
             localStorage.setItem('home_settings', JSON.stringify(actuel_settings));
+
 
             div_snap = null;
             div_snap_position = null;
@@ -295,7 +299,7 @@ function create_document_groupe() {
 
     const div_titre = document.createElement('div');
     div_titre.classList.add('div_document_titre');
-    div_titre.innerHTML = '<h2>Documents</h2>';
+    div_titre.innerHTML = `<h2>${titre}</h2>`;
 
     const div_trou2 = document.createElement('div');
     div_trou2.classList.add('div_round_trou', 'close');
@@ -329,7 +333,7 @@ function create_document_groupe() {
 
 
             let actuel_settings = JSON.parse(localStorage.getItem('home_settings'));
-            actuel_settings.document.close = false;
+            actuel_settings.document[id].close = false;
             localStorage.setItem('home_settings', JSON.stringify(actuel_settings));
 
         } else {
@@ -338,7 +342,7 @@ function create_document_groupe() {
 
 
             let actuel_settings = JSON.parse(localStorage.getItem('home_settings'));
-            actuel_settings.document.close = true;
+            actuel_settings.document[id].close = true;
             localStorage.setItem('home_settings', JSON.stringify(actuel_settings));
 
         }
@@ -352,15 +356,18 @@ function create_document_groupe() {
 
     div_content.appendChild(div_header);
     div_content.appendChild(div_content_inner);
-    div_content_inner.appendChild(add_div);
+
+    if (titre !== "Agenda") {
+        div_content_inner.appendChild(add_div);
+    }
 
     document.querySelector('main').appendChild(div_content);
 
     // get from local storage
     if (localStorage.getItem('home_settings')) {
         let actuel_settings = JSON.parse(localStorage.getItem('home_settings'));
-        div_content.style.transform = `translate(${actuel_settings.document.position.x}px, ${actuel_settings.document.position.y}px)`;
-        if (actuel_settings.document.close) {
+        div_content.style.transform = `translate(${actuel_settings.document[id].position.x}px, ${actuel_settings.document[id].position.y}px)`;
+        if (actuel_settings.document[id].close) {
             div_content.style.height = '70px';
             add_div.style.display = 'none';
         } else {
@@ -368,7 +375,7 @@ function create_document_groupe() {
             add_div.style.display = 'flex';
         }
 
-        div_snap = document.getElementById(actuel_settings.document.snap);
+        div_snap = document.getElementById(actuel_settings.document[id].snap);
         if (!div_snap) {
             return;
         }
@@ -449,7 +456,7 @@ async function accepeterLesPartages(){
                 return;
             }
         
-            [parent,add_div] = create_document_groupe()
+            [parent,add_div] = create_document_groupe("Documents",1);
 
             // supprimer les documents
             let divs = document.querySelectorAll('.div_doc');

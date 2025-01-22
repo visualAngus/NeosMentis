@@ -132,6 +132,25 @@ main{
 
     transition: all var(--transition);
 }
+.div_add_event{
+    width: 100%;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-size: 1em;
+    font-weight: 600;
+    background-color: var(--bleu-overlay);
+    border-radius: 0px;
+
+    transform: translateX(-5px) translateY(5px);
+
+    z-index: 20;
+    position: absolute;
+}
 .div_jours{
     width: calc(100% - 60px);
     height: 40px;
@@ -174,8 +193,8 @@ main{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px;
     justify-content: flex-start;
+    padding: 10px;
     gap: 5px;
     margin: 5px;
 
@@ -190,6 +209,8 @@ main{
 
     border: 1.5px solid var(--noir-petit);
 
+    overflow: hidden;
+
     /* transform-origin: left top; */
 
 }
@@ -200,6 +221,7 @@ main{
 .div_event:active{
     box-shadow: 10px 10px 5px var(--noir-shadow);
 }
+
 
 .div_cursor{
     left: 0;
@@ -219,6 +241,7 @@ main{
     font-size: 1em;
     font-weight: 600;
     color: white;
+    min-height: 20px;
 
     width: 100%;
     text-align: left;
@@ -242,7 +265,7 @@ main{
     font-size: 16px;
 }
 
-button {
+.div_control button {
     color: var(--noir);
     border: none;
     border-radius:50%;
@@ -258,7 +281,7 @@ button {
 
 }
 
-button:hover {
+.div_control button:hover {
     background-color: var(--bleu);
 }
 
@@ -288,7 +311,7 @@ button:hover {
 }
 
 /* div_popup */
-.div_popup{
+.div_popup,.div_popup_add_event{
     position: absolute;
     width: 500px;
     background-color: var(--text-color);
@@ -300,6 +323,118 @@ button:hover {
     display: none;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: flex-start;
+}
+#date_heure_event_pop_add{
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    width:50px;
+}
+#date_event_pop_add{
+    border: none;
+    outline: none;
+    text-align: left;
+    color: var(--noir);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1em;
+
+    padding: 0 10px;
+    border-right: 1px solid var(--noir-petit);
+
+    width: 150px;
+}
+#heure_event_pop_add{
+    border: none;
+    outline: none;
+    text-align: left;
+    color: var(--noir);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1em;
+    padding: 0 10px;
+}
+#localisation_event_pop_add,#description_event_pop_add{
+    border: none;
+    outline: none;
+    text-align: left;
+    color: var(--noir);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1em;
+    padding: 0 10px;
+}
+#groupe_event_pop_add{
+    border: none;
+    outline: none;
+    text-align: left;
+    color: var(--noir);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1em;
+    padding: 0 10px;
+}
+#titre_event_pop_add{
+    border: none;
+    outline: none;
+    text-align: left;
+    color: var(--noir);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 1.5em;
+}
+
+.btn_add{
+    outline: none;
+    border: none;
+    background-color: var(--contrast-vert);
+    color: var(--text-color);
+    padding: 10px;
+    font-weight: 600;
+    border-radius: 5px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 0.8em;
+    cursor: pointer;
+
+    transition: background-color var(--transition);
+
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+.btn_add:hover{
+    background-color: var(--light-gris);
+}
+.btn_add:active{
+    background-color: var(--contrast-vert);
+}
+
+.parent_time_start,.parent_time_end{
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: flex-start;
 }
 .div_illustration{
@@ -335,7 +470,6 @@ button:hover {
 }
 .div_title_info_parent{
     width: calc(100% - 50px);
-    height: 65px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -441,6 +575,8 @@ button:hover {
 
     padding: 10px;
     padding-left: 25px;
+
+    position: relative;
 }
 .document_link_pop,.link_pop{
     height: 100%;

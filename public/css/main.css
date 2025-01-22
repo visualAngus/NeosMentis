@@ -38,6 +38,13 @@
     --transition : 0.2s cubic-bezier(0.4, 0, 0.2, 1);   
 
     --toolbox--height : 270px;
+
+
+
+    --vert-ok : #54c51f;
+    --orange-ok : #f5a623;
+    --rouge-ok : #d44a4a;
+    
 }
 
 
