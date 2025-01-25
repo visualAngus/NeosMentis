@@ -18,32 +18,30 @@ function open_profile_menu(parent) {
 }
 
 async function get_all_user_info() {
-    try {
-        const response = await fetch('/get_all_user_info');
-        const data = await response.json();
-        if (data.success) {
-            document.querySelector('.div_profil_bnt').style.display = 'none';
-            const div = document.createElement('div');
-            div.classList.add('div_profil_name');
-            let h2 = document.createElement('h2');
-            h2.innerHTML = data.data.username;
-            div.appendChild(h2);
-            document.querySelector('.div_compte_header').appendChild(div);
+    const response = await fetch('/get_all_user_info');
+    const data = await response.json();
+    console.log(data);
+    if (data.success) {
+        document.querySelector('.div_profil_bnt').style.display = 'none';
+        const div = document.createElement('div');
+        div.classList.add('div_profil_name');
+        let h2 = document.createElement('h2');
+        h2.innerHTML = data.data.username;
+        div.appendChild(h2);
+        document.querySelector('.div_compte_header').appendChild(div);
 
-            h2.addEventListener('click', () => {
-                // open_profile_menu(h2);
-            });
+        h2.addEventListener('click', () => {
+            // open_profile_menu(h2);
+        });
 
-            let settings = data.settings;
+        let settings = data.settings;
+        console.log(settings.home_settings);
+        console.log(settings.style_settings);
+        localStorage.setItem('home_settings', JSON.stringify(settings.home_settings));
+        localStorage.setItem('style_settings', JSON.stringify(settings.style_settings));
 
-            localStorage.setItem('home_settings', JSON.stringify(settings.home_settings));
-            localStorage.setItem('style_settings', JSON.stringify(settings.style_settings));
-
-        } else {
-            console.error('Error fetching users:', data.message);
-        }
-    } catch (error) {
-        console.error('Failed to fetch users:', error);
+    } else {
+        console.error('Error fetching users:', data.message);
     }
 }
 
@@ -230,6 +228,8 @@ function create_document_groupe(titre, id) {
             div_content.style.transform = `translate(${x}px, ${y}px)`;
 
             const actuel_settings = JSON.parse(localStorage.getItem('home_settings')) || {};
+
+            actuel_settings.document = actuel_settings.document || {};
             actuel_settings.document[id] = actuel_settings.document[id] || {};
             actuel_settings.document[id].position = { x, y };
             localStorage.setItem('home_settings', JSON.stringify(actuel_settings));
@@ -364,8 +364,8 @@ function create_document_groupe(titre, id) {
     document.querySelector('main').appendChild(div_content);
 
     // get from local storage
-    if (localStorage.getItem('home_settings')) {
-        let actuel_settings = JSON.parse(localStorage.getItem('home_settings'));
+    let actuel_settings = JSON.parse(localStorage.getItem('home_settings'));
+    if (actuel_settings) {
         div_content.style.transform = `translate(${actuel_settings.document[id].position.x}px, ${actuel_settings.document[id].position.y}px)`;
         if (actuel_settings.document[id].close) {
             div_content.style.height = '70px';

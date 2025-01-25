@@ -543,6 +543,58 @@ app.get('/agenda/2weeks', (req, res) => {
     });
 });
 
+
+app.post('/carte/save_carte_settings', (req, res) => {
+    console.log("req.body:");
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    try {
+        const carte_connections = JSON.stringify(req.body.carte_connections);
+        const carte_blocs = JSON.stringify(req.body.carte_blocs);
+
+        console.log("carte_connections:", carte_connections);
+        console.log("carte_blocs:", carte_blocs);
+
+        connection.query(`UPDATE projects 
+                            JOIN projects_key_link ON projects.id_project = projects_key_link.project_id_link 
+                            SET projects.settings_connection = ?, projects.settings_bloc = ? 
+                            WHERE projects_key_link.user_id_link = ?`,
+            [carte_connections,carte_blocs, data.userID], (error) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+
+            return res.json({ success: true, message: 'Settings saved successfully' });
+        });
+    } catch (error) {
+        return res.json({ success: false, message: 'Invalid data format' });
+    }
+});
+
+app.get('/carte/get_carte_settings', (req, res) => {
+    console.log("req.body:");
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    connection.query(`SELECT projects.settings_connection, projects.settings_bloc 
+                        FROM projects 
+                        JOIN projects_key_link ON projects.id_project = projects_key_link.project_id_link 
+                        WHERE projects_key_link.user_id_link = ?`, [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        if (results.length === 0) {
+            return res.json({ success: true, data: {} });
+        }
+
+        return res.json({ success: true, data: results[0] });
+    });
+});
+
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 // });

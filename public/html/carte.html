@@ -7,81 +7,76 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/carte.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
-    <script>
-        let temps_vise = 3;
+    <div class="load_div">
+        <div class="loader"></div>
+    </div>
+</body>
+<script>
 
-        const endpointOptions_in = {
-            isSource: true,
-            isTarget: false,
-            maxConnections: -1,
-            endpoint: ["Dot", { radius: 5 }],
-            paintStyle: { fill: "var(--brun)" },
-            connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
-            connector: ["Bezier", { curviness: 50 }],
-            cssClass: "endpoint-in",
-            overlays: [
-                ["PlainArrow", {
-                    location: 1,
-                    width: 10,
-                    length: 10,
-                    paintStyle: { fill: "var(--bleu)" },
-                    foldback: 0.8,
-                    detachable: true
-                }]
-            ]
-        };
-        const endpointOptions_out = {
-            isSource: false,
-            isTarget: true,
-            maxConnections: -1,
-            endpoint: ["Rectangle", { width: 5, height: 30 }],
-            paintStyle: { fill: "var(--text-color)" },
-            connectorStyle: { stroke: "red", strokeWidth: 2 },
-            connector: ["Bezier", { curviness: 50 }],
-            overlays: [
-                ["PlainArrow", {
-                    location: 1,
-                    width: 10,
-                    length: 10,
-                    detachable: true
-                }]
-            ],
-            cssClass: "endpoint-out",  // Class for endpoints
-            connectorClass: "connector-class"  // Class for connectors
-        };
-        jsPlumb.ready(function () {
-            jsPlumb.setContainer(document.body);
+    let temps_vise = 13.5;
 
-
-
-            create_tache("t1", '1', 1,100, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t2", '2', 1.8,90, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t3", '3', 0.5,89, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t4", '4', 0.5,0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t5", '5', 2,0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t6", '6', 2,0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t7", '7', 10,31, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+    const endpointOptions_in = {
+        isSource: true,
+        isTarget: false,
+        maxConnections: -1,
+        endpoint: ["Dot", { radius: 5 }],
+        paintStyle: { fill: "var(--brun)" },
+        connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
+        connector: ["Bezier", { curviness: 50 }],
+        cssClass: "endpoint-in",
+        overlays: [
+            ["PlainArrow", {
+                location: 1,
+                width: 10,
+                length: 10,
+                paintStyle: { fill: "var(--bleu)" },
+                foldback: 0.8,
+                detachable: true
+            }]
+        ]
+    };
+    const endpointOptions_out = {
+        isSource: false,
+        isTarget: true,
+        maxConnections: -1,
+        endpoint: ["Rectangle", { width: 5, height: 30 }],
+        paintStyle: { fill: "var(--text-color)" },
+        connectorStyle: { stroke: "red", strokeWidth: 2 },
+        connector: ["Bezier", { curviness: 50 }],
+        overlays: [
+            ["PlainArrow", {
+                location: 1,
+                width: 10,
+                length: 10,
+                detachable: true
+            }]
+        ],
+        cssClass: "endpoint-out",  // Class for endpoints
+        connectorClass: "connector-class"  // Class for connectors
+    };
 
 
-            // // faire une connexion
-            // jsPlumb.ready(function () {
-            //     var endpointsOnFsdhg = jsPlumb.selectEndpoints({ element: "fsdhg" });
-            //     var endpointsOnFsd = jsPlumb.selectEndpoints({ element: "fsd" });
-            //     if (endpointsOnFsdhg.length > 0 && endpointsOnFsd.length > 0) {
-            //         jsPlumb.connect({
-            //             source: endpointsOnFsdhg.get(1),
-            //             target: endpointsOnFsd.get(0),
-            //             paintStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
-            //             connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
-            //             connector: ["Bezier", { curviness: 50 }],
-            //             cssClass: "connection1",
-            //             detachable: true,
-            //         });
-            //     }
-            // });
+    jsPlumb.ready(function () {
+        (async function () {
+            await get_project_settings();
+        })();
+        jsPlumb.setContainer(document.body);
+
+        setTimeout(() => {
+            create_tache("t1", '1', 1, 100, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t2", '2', 1.8, 90, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t3", '3', 0.5, 89, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t4", '4', 0.5, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t5", '5', 2, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t6", '6', 2, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
+            create_tache("t7", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
 
             jsPlumb.bind("connection", function (info) {
                 const connection = info.connection;
@@ -96,20 +91,19 @@
                 };
                 localStorage.setItem('connections', JSON.stringify(conn_localStorage));
 
+
                 connection.setParameter("info", "fssdfsffe");
                 // connection.setPaintStyle({ stroke: "yellow" });
                 // Ajouter un événement de double-clic pour éditer les informations
-                connection.bind("dblclick", function (conn) {
-                    console.log(info);
-                    const newInfo = prompt("Entrez les nouvelles informations pour cette connexion:", conn.getParameter("info"));
-                    if (newInfo !== null) {
-                        conn.setParameter("info", newInfo);
-                    }
-                });
+                // connection.bind("dblclick", function (conn) {
+                //     console.log(info);
+                //     const newInfo = prompt("Entrez les nouvelles informations pour cette connexion:", conn.getParameter("info"));
+                //     if (newInfo !== null) {
+                //         conn.setParameter("info", newInfo);
+                //     }
+                // });
+                get_all_time();
             });
-
-
-
 
             jsPlumb.bind("connectionDetached", function (info) {
                 const connection = info.connection;
@@ -117,6 +111,11 @@
                 let conn_localStorage = JSON.parse(localStorage.getItem('connections'));
                 delete conn_localStorage[info.id];
                 localStorage.setItem('connections', JSON.stringify(conn_localStorage));
+                // Properly clean up jsPlumb to avoid keeping unnecessary information
+                jsPlumb.deleteConnection(connection);
+                jsPlumb.repaintEverything();
+
+                get_all_time();
             });
 
 
@@ -139,8 +138,365 @@
             }
             get_all_time();
 
-            // enumerate all the connections, and add overlays to them.
-            jsPlumb.getAllConnections().forEach(function (conn) {
+            
+            document.querySelector('.load_div').style.display = 'none';
+        }, 1000);
+
+
+
+    });
+
+    function convert_float_to_hours(float_hour) {
+        const hours = Math.floor(float_hour);
+        const minutes = Math.round((float_hour % 1) * 60);
+        return (hours) + 'h' + (minutes < 10 ? '0' + minutes : minutes);
+    }
+    function create_tache(id, titre, temps, pourcentage, etat, description, contributeur,event=null) {
+        // Créer les éléments HTML
+        const newBloc = document.createElement('div');
+        const divGestion = document.createElement('div');
+        const divEtat = document.createElement('div');
+        const divTemps = document.createElement('div');
+        const h2Titre = document.createElement('h2');
+        const pDescription = document.createElement('p');
+        const divListPeople = document.createElement('div');
+        const divBtnClose = document.createElement('div');
+
+        // Définir les classes et IDs
+        newBloc.id = id;
+        let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+
+        if (actual_localStorage[id]) {
+            newBloc.style.top = actual_localStorage[id].position.y + 'px';
+            newBloc.style.left = actual_localStorage[id].position.x + 'px';
+
+            if (actual_localStorage[id].position.closed) {
+                newBloc.style.height = '0px';
+                newBloc.style.width = '250px';
+                newBloc.style.padding = '0px 25px 0px 25px';
+                divBtnClose.style.transform = 'translateX(-100%) translateY(-5px) rotate(180deg)';
+                // display none pour les enfants
+                h2Titre.style.display = 'none';
+                pDescription.style.display = 'none';
+                divListPeople.style.display = 'none';
+
+                // les point d'accroche les remonter de 150px
+                jsPlumb.selectEndpoints({ element: newBloc.id }).each(function (endpoint) {
+                    endpoint.anchor.y = 0;
+                });
+                jsPlumb.repaintEverything();
+            }
+        } else {
+            newBloc.style.top = 'calc(50vh - 100px)';
+            newBloc.style.left = 'calc(50vw - 100px)';
+        }
+        newBloc.className = 'bloc';
+        newBloc.setAttribute('data-time', temps);
+        newBloc.setAttribute('data-progress', pourcentage);
+
+        if (event) {
+            newBloc.style.top = event.clientY + 'px';
+            newBloc.style.left = event.clientX + 'px';
+        }
+
+        divBtnClose.className = 'btn_close';
+        divGestion.className = 'div_gestion';
+        divEtat.className = 'div_etat';
+        divTemps.className = 'div_temps_tache';
+        divListPeople.className = 'div_list_people';
+
+        // Définir le contenu
+        divEtat.textContent = etat;
+        divTemps.textContent = convert_float_to_hours(temps);
+        h2Titre.textContent = titre;
+        pDescription.textContent = description;
+        divBtnClose.textContent = '△';
+
+        // Ajouter les contributeurs
+        contributeur.forEach(c => {
+            const divPeople = document.createElement('div');
+            divPeople.className = 'people';
+            divPeople.textContent = c;
+            divListPeople.appendChild(divPeople);
+        });
+
+        // Construire la structure
+        divGestion.appendChild(divEtat);
+        divGestion.appendChild(divTemps);
+        newBloc.appendChild(divGestion);
+        newBloc.appendChild(h2Titre);
+        newBloc.appendChild(pDescription);
+        newBloc.appendChild(divListPeople);
+        newBloc.appendChild(divBtnClose);
+
+
+        divBtnClose.addEventListener('click', function () {
+            let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+
+
+            if (newBloc.style.height !== '0px') {
+                newBloc.style.height = '0px';
+                newBloc.style.width = '250px';
+                newBloc.style.padding = '0px 25px 0px 25px';
+                // display none pour les enfants
+                h2Titre.style.display = 'none';
+                pDescription.style.display = 'none';
+                divListPeople.style.display = 'none';
+                divBtnClose.style.transform = 'translateX(-100%) translateY(-5px) rotate(180deg)';
+
+                // les point d'accroche les remonter de 150px
+                jsPlumb.selectEndpoints({ element: newBloc.id }).each(function (endpoint) {
+                    endpoint.anchor.y = 0;
+                });
+                jsPlumb.repaintEverything();
+                actual_localStorage[newBloc.id].position = {
+                    x: parseFloat(newBloc.style.left),
+                    y: parseFloat(newBloc.style.top),
+                    closed: true
+                };
+
+            } else {
+                newBloc.style.height = '';
+                newBloc.style.width = '';
+                newBloc.style.padding = '15px 25px 5px 25px';
+                // display none pour
+                h2Titre.style.display = 'flex';
+                pDescription.style.display = 'flex';
+                divListPeople.style.display = 'flex';
+                divBtnClose.style.transform = '';
+
+                // remettre les point d'accroche à leur place
+                
+                jsPlumb.selectEndpoints({ element: newBloc.id }).each(function (endpoint) {
+                    endpoint.anchor.y = 0.5;
+                });
+                jsPlumb.repaintEverything();
+                actual_localStorage[newBloc.id].position = {
+                    x: parseFloat(newBloc.style.left),
+                    y: parseFloat(newBloc.style.top),
+                    closed: false
+                };
+
+            }
+
+            localStorage.setItem('blocs', JSON.stringify(actual_localStorage));
+        });
+
+        // Ajouter au document et configurer jsPlumb
+        document.body.appendChild(newBloc);
+        jsPlumb.addEndpoint(newBloc.id, { anchors: "LeftMiddle" }, endpointOptions_out);
+        jsPlumb.addEndpoint(newBloc.id, { anchors: "RightMiddle" }, endpointOptions_in);
+
+        jsPlumb.draggable(newBloc.id, {
+            drag: function (event) {
+            },
+            stop: function (event) {
+
+                let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+
+                if (!actual_localStorage[newBloc.id]) {
+                    actual_localStorage = {
+                        ...actual_localStorage,
+                        [newBloc.id]: {
+                            position: {
+                                x: event.pos[0],
+                                y: event.pos[1],
+                                closed: actual_localStorage[newBloc.id] ? actual_localStorage[newBloc.id].position.closed : false
+                            }
+                        }
+                    };
+                } else {
+                    actual_localStorage[newBloc.id].position = {
+                        x: event.pos[0],
+                        y: event.pos[1],
+                        closed: actual_localStorage[newBloc.id].position.closed
+                    };
+                }
+                localStorage.setItem('blocs', JSON.stringify(actual_localStorage));
+                save_project_settings(false);
+
+            }
+        });
+
+        return newBloc;
+    }
+
+    function add_time_left(parent, time, liste_path) {
+        // si le parent a déjà un div_time_left, on le supprime
+        if (parent.querySelector('.div_time_left')) {
+            console.log('remove');
+            parent.querySelector('.div_time_left').remove();
+        }
+        const divTimeLeft = document.createElement('div');
+        divTimeLeft.className = 'div_time_left';
+        divTimeLeft.textContent = convert_float_to_hours(time);
+        if (time > temps_vise) {
+            divTimeLeft.style.backgroundColor = 'var(--rouge-ok)';
+        } else if (time >= temps_vise * 0.9) {
+            divTimeLeft.style.backgroundColor = 'var(--orange-ok)';
+        } else {
+            divTimeLeft.style.backgroundColor = 'var(--vert-ok)';
+        }
+        divTimeLeft.setAttribute('data-liste-path', JSON.stringify(liste_path));
+        parent.appendChild(divTimeLeft);
+
+        divTimeLeft.addEventListener('mouseover', function () {
+            let noeud = document.querySelectorAll('.bloc');
+            noeud.forEach(n => {
+                if (liste_path.includes(n.id)) {
+                    n.style.backgroundColor = 'var(--bleu)';
+                } else {
+                    n.style.backgroundColor = '';
+                }
+            });
+        });
+
+        divTimeLeft.addEventListener('mouseout', function () {
+            let noeud = document.querySelectorAll('.bloc');
+            noeud.forEach(n => {
+                n.style.backgroundColor = '';
+            });
+        });
+    }
+
+    /**
+     * Finds all possible paths from a given node in a directed graph
+     * @param {string} nodeId - The ID of the starting node
+     * @param {Array} visitedNodes - Array to keep track of visited nodes (default: empty array)
+     * @returns {Array} Array of arrays, each containing a possible path through the graph
+     */
+    function findAllPaths(nodeId, visitedNodes = []) {
+        // Add current node to visited nodes
+        visitedNodes.push(nodeId);
+
+        // Get all connections where this node is the target
+        const connections = jsPlumb.getConnections({ target: nodeId });
+
+        // Base case: if no connections, return path with just this node
+        if (connections.length === 0) {
+            return [[nodeId]];
+        }
+
+        let paths = [];
+        // For each connection, recursively find paths
+        connections.forEach(connection => {
+            // Avoid cycles by checking if node was already visited
+            if (!visitedNodes.includes(connection.sourceId)) {
+                // Recursive call with new copy of visited nodes
+                const subPaths = findAllPaths(connection.sourceId, [...visitedNodes]);
+                // Add current node to start of each subpath
+                subPaths.forEach(subPath => {
+                    paths.push([nodeId, ...subPath]);
+                });
+            }
+        });
+        return paths;
+    }
+
+    function total_time_from_path(path) {
+        let total_time = 0;
+        if (!Array.isArray(path)) {
+            path = [path];
+        }
+        path.slice(1).forEach(node => {
+            let time = parseFloat(document.getElementById(node).getAttribute('data-time'));
+            total_time += time;
+        });
+        return total_time;
+    }
+
+    function get_all_time() {
+        console.log('get_all_time');
+        let json_layer = {}
+        let sourceDepthMap = {};
+
+        document.querySelectorAll('.bloc').forEach(bloc => {
+            const blocId = bloc.id;
+            const blocConnections = jsPlumb.getConnections({ target: blocId });
+            if (blocConnections.length === 0) {
+                json_layer = {
+                    ...json_layer,
+                    [0]: [{
+                        source: blocId,
+                        target: null
+                    }]
+                };
+            } else {
+                const allPaths = findAllPaths(blocConnections[0].target.id);
+                allPaths.forEach(path => {
+                    const depth = path.length - 1;
+                    path.push(total_time_from_path(path));
+                    if (sourceDepthMap[blocId] === undefined || depth > sourceDepthMap[blocId]) {
+                        // rajoute a la fin de chaque liste le temps qu'il faut pour la parcourir
+
+                        // Remove from previous depth if exists
+                        if (sourceDepthMap[blocId] !== undefined) {
+                            json_layer[sourceDepthMap[blocId]] = json_layer[sourceDepthMap[blocId]].filter(item => item.source !== blocId);
+                        }
+                        // Add to current depth
+                        if (json_layer[depth]) {
+
+                            json_layer[depth].push({
+                                source: blocId,
+                                target: path[path.length - 1],
+                                visited: [path]
+                            });
+                        } else {
+                            json_layer[depth] = [{
+                                source: blocId,
+                                target: path[path.length - 1],
+                                visited: [path]
+                            }];
+                        }
+                        // Update the source depth map
+                        sourceDepthMap[blocId] = depth;
+                    } else {
+                        // cherche dans le json la source qui est égale à blocId
+                        Object.keys(json_layer).forEach(layer => {
+                            json_layer[layer].forEach(elem => {
+                                if (elem.source === blocId) {
+                                    elem.visited = [...elem.visited, path];
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        });
+        console.log(json_layer);
+        Object.keys(json_layer).forEach(layer => {
+            json_layer[layer].forEach(elem => {
+                if (elem.visited) {
+                    let visited = elem.visited;
+                    let max_time = 0;
+                    let finale_path;
+                    visited.forEach(visit => {
+                        let time = visit[visit.length - 1];
+                        if (time > max_time) {
+                            max_time = time;
+                            finale_path = visit;
+                        }
+                    });
+                    document.getElementById(elem.source).setAttribute('data-time-start', max_time);
+                    add_time_left(document.getElementById(elem.source), max_time, finale_path);
+                }
+            });
+        });
+
+
+        // supprimer les .div_pourcentage 
+        document.querySelectorAll('.div_pourcentage').forEach(div => {
+            div.remove();
+        });
+
+        // supprimer les .jtk-overlay
+        document.querySelectorAll('.jtk-overlay').forEach(div => {
+            div.remove();
+        });
+
+        // enumerate all the connections, and add overlays to them.
+        jsPlumb.getAllConnections().forEach(function (conn) {
+                                
                 conn.addOverlay(["Arrow", { location: 1, width: 10, length: 10 }]);
 
                 // Add an overlay to the connection
@@ -168,268 +524,73 @@
                     div_pourcentage.style.backgroundColor = 'var(--vert-ok)';
                 }
 
+
                 document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
             });
 
+    }
+
+    async function save_project_settings(auto = true) {
+        if (auto) {
+            return;
+        }
+        let connections = JSON.parse(localStorage.getItem('connections')) || {};
+        let blocs = JSON.parse(localStorage.getItem('blocs')) || {};
+
+        if (Object.keys(connections).length === 0 && Object.keys(blocs).length === 0) {
+            console.error('No data to save');
+            return;
+        }
+
+        console.log('connections:', connections);
+        console.log('blocs:', blocs);
+
+        const response = await fetch('/carte/save_carte_settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                carte_connections: connections,
+                carte_blocs: blocs
+            })
         });
-
-        function convert_float_to_hours(float_hour) {
-            const hours = Math.floor(float_hour);
-            const minutes = Math.round((float_hour % 1) * 60);
-            return (hours) + 'h' + (minutes < 10 ? '0' + minutes : minutes);
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+            console.log('Settings saved successfully');
+        } else {
+            console.error('Error saving settings:', data.message);
         }
-        function create_tache(id, titre, temps,pourcentage, etat, description, contributeur) {
-            // Créer les éléments HTML
-            const newBloc = document.createElement('div');
-            const divGestion = document.createElement('div');
-            const divEtat = document.createElement('div');
-            const divTemps = document.createElement('div');
-            const h2Titre = document.createElement('h2');
-            const pDescription = document.createElement('p');
-            const divListPeople = document.createElement('div');
 
-            // Définir les classes et IDs
-            newBloc.id = id;
-            let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+    }
 
-            if (actual_localStorage[id]) {
-                newBloc.style.top = actual_localStorage[id].position.y + 'px';
-                newBloc.style.left = actual_localStorage[id].position.x + 'px';
-            } else {
-                newBloc.style.top = 'calc(50vh - 100px)';
-                newBloc.style.left = 'calc(50vw - 100px)';
+    async function get_project_settings() {
+        const response = await fetch('/carte/get_carte_settings', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-            newBloc.className = 'bloc';
-            newBloc.setAttribute('data-time', temps);
-            newBloc.setAttribute('data-progress', pourcentage);
-
-            divGestion.className = 'div_gestion';
-            divEtat.className = 'div_etat';
-            divTemps.className = 'div_temps_tache';
-            divListPeople.className = 'div_list_people';
-
-            // Définir le contenu
-            divEtat.textContent = etat;
-            divTemps.textContent = convert_float_to_hours(temps);
-            h2Titre.textContent = titre;
-            pDescription.textContent = description;
-
-            // Ajouter les contributeurs
-            contributeur.forEach(c => {
-                const divPeople = document.createElement('div');
-                divPeople.className = 'people';
-                divPeople.textContent = c;
-                divListPeople.appendChild(divPeople);
-            });
-
-            // Construire la structure
-            divGestion.appendChild(divEtat);
-            divGestion.appendChild(divTemps);
-            newBloc.appendChild(divGestion);
-            newBloc.appendChild(h2Titre);
-            newBloc.appendChild(pDescription);
-            newBloc.appendChild(divListPeople);
-
-            // Ajouter au document et configurer jsPlumb
-            document.body.appendChild(newBloc);
-            jsPlumb.addEndpoint(newBloc.id, { anchors: "LeftMiddle" }, endpointOptions_out);
-            jsPlumb.addEndpoint(newBloc.id, { anchors: "RightMiddle" }, endpointOptions_in);
-
-            jsPlumb.draggable(newBloc.id, {
-                drag: function (event) {
-                },
-                stop: function (event) {
-
-                    let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
-
-                    if (!actual_localStorage[newBloc.id]) {
-                        actual_localStorage = {
-                            ...actual_localStorage,
-                            [newBloc.id]: {
-                                position: {
-                                    x: event.pos[0],
-                                    y: event.pos[1]
-                                }
-                            }
-                        };
-                    } else {
-                        actual_localStorage[newBloc.id].position = {
-                            x: event.pos[0],
-                            y: event.pos[1]
-                        };
-                    }
-                    localStorage.setItem('blocs', JSON.stringify(actual_localStorage));
-
-                }
-            });
-
-            return newBloc;
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+            let settings_connection = data.data.settings_connection;
+            let settings_bloc = data.data.settings_bloc;
+            localStorage.setItem('connections', settings_connection);
+            localStorage.setItem('blocs', settings_bloc);
+        } else {
+            console.error('Error retrieving settings:', data.message);
         }
+    }
 
-        function add_time_left(parent, time, liste_path) {
-            const divTimeLeft = document.createElement('div');
-            divTimeLeft.className = 'div_time_left';
-            divTimeLeft.textContent = convert_float_to_hours(time);
-            if (time > temps_vise) {
-                divTimeLeft.style.backgroundColor = 'var(--rouge-ok)';
-            } else if (time >= temps_vise * 0.9) {
-                divTimeLeft.style.backgroundColor = 'var(--orange-ok)';
-            } else {
-                divTimeLeft.style.backgroundColor = 'var(--vert-ok)';
-            }
-            divTimeLeft.setAttribute('data-liste-path', JSON.stringify(liste_path));
-            parent.appendChild(divTimeLeft);
-
-            divTimeLeft.addEventListener('mouseover', function () {
-                let noeud = document.querySelectorAll('.bloc');
-                noeud.forEach(n => {
-                    if (liste_path.includes(n.id)) {
-                        n.style.backgroundColor = 'var(--bleu)';
-                    } else {
-                        n.style.backgroundColor = '';
-                    }
-                });
-            });
-
-            divTimeLeft.addEventListener('mouseout', function () {
-                let noeud = document.querySelectorAll('.bloc');
-                noeud.forEach(n => {
-                    n.style.backgroundColor = '';
-                });
-            });
+    document.addEventListener('mousedown', function (e) {
+        if (e.ctrlKey && e.altKey) {
+            create_tache("t8", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp'],e);
         }
+    });
 
+</script>
 
-
-
-        /**
-         * Finds all possible paths from a given node in a directed graph
-         * @param {string} nodeId - The ID of the starting node
-         * @param {Array} visitedNodes - Array to keep track of visited nodes (default: empty array)
-         * @returns {Array} Array of arrays, each containing a possible path through the graph
-         */
-        function findAllPaths(nodeId, visitedNodes = []) {
-            // Add current node to visited nodes
-            visitedNodes.push(nodeId);
-
-            // Get all connections where this node is the target
-            const connections = jsPlumb.getConnections({ target: nodeId });
-
-            // Base case: if no connections, return path with just this node
-            if (connections.length === 0) {
-                return [[nodeId]];
-            }
-
-            let paths = [];
-            // For each connection, recursively find paths
-            connections.forEach(connection => {
-                // Avoid cycles by checking if node was already visited
-                if (!visitedNodes.includes(connection.sourceId)) {
-                    // Recursive call with new copy of visited nodes
-                    const subPaths = findAllPaths(connection.sourceId, [...visitedNodes]);
-                    // Add current node to start of each subpath
-                    subPaths.forEach(subPath => {
-                        paths.push([nodeId, ...subPath]);
-                    });
-                }
-            });
-            return paths;
-        }
-
-        function total_time_from_path(path) {
-            let total_time = 0;
-            if (!Array.isArray(path)) {
-                path = [path];
-            }
-            path.slice(1).forEach(node => {
-                let time = parseFloat(document.getElementById(node).getAttribute('data-time'));
-                total_time += time;
-            });
-            return total_time;
-        }
-
-        function get_all_time() {
-            let json_layer = {}
-            let sourceDepthMap = {};
-
-            document.querySelectorAll('.bloc').forEach(bloc => {
-                const blocId = bloc.id;
-                const blocConnections = jsPlumb.getConnections({ target: blocId });
-                if (blocConnections.length === 0) {
-                    json_layer = {
-                        ...json_layer,
-                        [0]: [{
-                            source: blocId,
-                            target: null
-                        }]
-                    };
-                } else {
-                    const allPaths = findAllPaths(blocConnections[0].target.id);
-                    allPaths.forEach(path => {
-                        const depth = path.length - 1;
-                        path.push(total_time_from_path(path));
-                        if (sourceDepthMap[blocId] === undefined || depth > sourceDepthMap[blocId]) {
-                            // rajoute a la fin de chaque liste le temps qu'il faut pour la parcourir
-
-                            // Remove from previous depth if exists
-                            if (sourceDepthMap[blocId] !== undefined) {
-                                json_layer[sourceDepthMap[blocId]] = json_layer[sourceDepthMap[blocId]].filter(item => item.source !== blocId);
-                            }
-                            // Add to current depth
-                            if (json_layer[depth]) {
-
-                                json_layer[depth].push({
-                                    source: blocId,
-                                    target: path[path.length - 1],
-                                    visited: [path]
-                                });
-                            } else {
-                                json_layer[depth] = [{
-                                    source: blocId,
-                                    target: path[path.length - 1],
-                                    visited: [path]
-                                }];
-                            }
-                            // Update the source depth map
-                            sourceDepthMap[blocId] = depth;
-                        } else {
-                            // cherche dans le json la source qui est égale à blocId
-                            Object.keys(json_layer).forEach(layer => {
-                                json_layer[layer].forEach(elem => {
-                                    if (elem.source === blocId) {
-                                        elem.visited = [...elem.visited, path];
-                                    }
-                                });
-                            });
-                        }
-                    });
-                }
-            });
-            console.log(json_layer);
-            Object.keys(json_layer).forEach(layer => {
-                json_layer[layer].forEach(elem => {
-                    if (elem.visited) {
-                        let visited = elem.visited;
-                        let max_time = 0;
-                        let finale_path;
-                        visited.forEach(visit => {
-                            let time = visit[visit.length - 1];
-                            if (time > max_time) {
-                                max_time = time;
-                                finale_path = visit;
-                            }
-                        });
-                        console.log(max_time);
-                        document.getElementById(elem.source).setAttribute('data-time-start', max_time);
-                        add_time_left(document.getElementById(elem.source), max_time, finale_path);
-                    }
-                });
-            });
-
-        }
-
-
-    </script>
-</body>
 
 </html>

@@ -158,6 +158,8 @@
 
     position: relative;
     overflow: hidden;
+    user-select: none;  
+
 
 }
 .div_pourcentage{
@@ -168,4 +170,21 @@
     height: 30px;
     background-color: var(--bleu);
     z-index: -1;
+
+    user-select: none;  
+}
+
+.btn_close{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translateX(-100%) translateY(-5px);
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: 1em;
+    font-style: normal;
+
+    cursor: pointer;
 }
