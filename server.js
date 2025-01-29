@@ -545,7 +545,6 @@ app.get('/agenda/2weeks', (req, res) => {
 
 
 app.post('/carte/save_carte_settings', (req, res) => {
-    console.log("req.body:");
     let data = verificationAll(req,res);
     if (!data) {
         return res.redirect('/log');
@@ -553,9 +552,6 @@ app.post('/carte/save_carte_settings', (req, res) => {
     try {
         const carte_connections = JSON.stringify(req.body.carte_connections);
         const carte_blocs = JSON.stringify(req.body.carte_blocs);
-
-        console.log("carte_connections:", carte_connections);
-        console.log("carte_blocs:", carte_blocs);
 
         connection.query(`UPDATE projects 
                             JOIN projects_key_link ON projects.id_project = projects_key_link.project_id_link 
@@ -574,7 +570,6 @@ app.post('/carte/save_carte_settings', (req, res) => {
 });
 
 app.get('/carte/get_carte_settings', (req, res) => {
-    console.log("req.body:");
     let data = verificationAll(req,res);
     if (!data) {
         return res.redirect('/log');
@@ -594,6 +589,167 @@ app.get('/carte/get_carte_settings', (req, res) => {
         return res.json({ success: true, data: results[0] });
     });
 });
+
+app.post('/carte/add_task', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const title = req.body.title;
+    const description = req.body.description;
+    const id_project = req.body.id_project;
+    const duree_theorique = req.body.duree_theorique;
+    const pourcentage_avancemennt = req.body.pourcentage_avancemennt;
+    const contributeurs = req.body.contributeurs;
+    const materiels = req.body.materiels;
+    const link_ressources = req.body.link_ressources;
+    const etat = req.body.etat;
+
+
+    connection.query('INSERT INTO tasks (title, description, project_id_link,duree_theorique,pourcentage_avancemennt,contributeurs,materiels,link_ressources,etat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [title, description, id_project, duree_theorique, pourcentage_avancemennt, contributeurs, materiels, link_ressources,etat], (error, _results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        // recupère les données de la task
+        connection.query('SELECT * FROM tasks WHERE project_id_link = ? AND id_tache = ?', [id_project, _results.insertId], (error, results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, tasks: results });
+        });
+    });
+});
+
+app.post('/carte/get_all_project_tasks', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_project = req.body.id_project;
+    connection.query('SELECT * FROM tasks WHERE project_id_link = ?', [id_project], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, tasks: results });
+    });
+});
+
+app.post('/carte/update_task', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id = req.body.id;
+    const title = req.body.title;
+    const description = req.body.description;
+    const duree_theorique = req.body.duree_theorique;
+    const pourcentage_avancemennt = req.body.pourcentage_avancemennt;
+    const contributeurs = req.body.contributeurs;
+    const materiels = req.body.materiels;
+    const link_ressources = req.body.link_ressources;
+    const etat = req.body.etat;
+
+    connection.query('UPDATE tasks SET title = ?, description = ?, duree_theorique = ?, pourcentage_avancemennt = ?, contributeurs = ?, materiels = ?, link_ressources = ?, etat = ? WHERE id_tache = ?',
+        [title, description, duree_theorique, pourcentage_avancemennt, contributeurs, materiels, link_ressources, etat, id], (error, _results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, message: 'Task updated successfully' });
+    });
+});
+
+app.post('/carte/delete_task', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_task = req.body.id_task;
+    const id_project = req.body.id_project;
+    connection.query('DELETE FROM tasks WHERE id_tache = ? AND project_id_link = ?', [id_task, id_project], (error, _results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, message: 'Task deleted successfully' });
+    });
+});
+
+app.get('/get_all_collaborators_of_one_user', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    connection.query(`SELECT users.user_id as id, users.user_name as name, users.email as email 
+                    FROM users_link 
+                    LEFT JOIN users ON (users_link.user2 = users.user_id AND users_link.user1 = ?) OR (users_link.user1 = users.user_id AND users_link.user2 = ?)
+                    WHERE users.user_id != ?`
+        , [data.userID, data.userID, data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, collaborators: results });
+    });
+});
+app.post('/recherche_collaborators', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const search = req.body.search;
+    connection.query(`SELECT users.user_id as id, users.user_name as name, users.email as email 
+                    FROM users_link 
+                    LEFT JOIN users ON (users_link.user2 = users.user_id AND users_link.user1 = ?) OR (users_link.user1 = users.user_id AND users_link.user2 = ?)
+                    WHERE users.user_name LIKE ? AND users.user_id != ?`
+        , [data.userID, data.userID, '%' + search + '%', data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, collaborators: results });
+    });
+});
+app.post('/recher_user', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const search = req.body.search;
+    connection.query(`SELECT user_id as id, user_name as name, email
+                    FROM users
+                    WHERE user_name LIKE ? AND user_id != ?`
+        , ['%' + search + '%', data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, users: results });
+    });
+});
+app.post('/add_collaborator', (req, res) => {
+    let data = verificationAll(req,res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_user = req.body.collaborator;
+
+    // Vérifier si le collaborateur existe déjà
+    connection.query('SELECT * FROM users_link WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)', 
+        [data.userID, id_user, id_user, data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        if (results.length > 0) {
+            return res.json({ success: false, message: 'Collaborator already exists' });
+        }
+
+        // Ajouter le collaborateur s'il n'existe pas déjà
+        connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, message: 'Collaborator added successfully' });
+        });
+    });
+});
+
 
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);

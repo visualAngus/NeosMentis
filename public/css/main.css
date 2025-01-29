@@ -43,7 +43,10 @@
 
     --vert-ok : #54c51f;
     --orange-ok : #f5a623;
+    --orange-shadow : #f5a52388;
     --rouge-ok : #d44a4a;
+
+    --transparent : transparent;
     
 }
 
@@ -54,8 +57,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
-
+*::-webkit-scrollbar{
+  width: 5px;
+}
+*::-webkit-scrollbar-thumb{
+  background-color: var(--text-color);
+  border-radius: 10px;
+}
 
 .load_div{
     position: absolute;

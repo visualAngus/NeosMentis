@@ -17,9 +17,54 @@
     <div class="load_div">
         <div class="loader"></div>
     </div>
+    <div class="workspace"></div>
+    <div class="div_menu unselected">
+        <h2 id="menu_titre">Menu</h2>
+        <div class="div_new">
+            <div class="div_supp_event">SUPP</div>
+        </div>
+        <div class="div_setting_task_parent">
+            <div class="div_titre_sett sett">
+                <input type="text" placeholder="Titre" id="titre_tache"></div>
+            </div>
+            <div class="div_description_sett sett">
+                <textarea name="description" id="description_tache" cols="30" rows="10"
+                    placeholder="Description"></textarea>
+            </div>
+            <div class="div_temps_sett sett">
+                <span>Temps : </span>
+                <input type="number" placeholder="J" id="temps_tache_jour" >
+                <span class="petit">j</span>
+                <input type="number" placeholder="H" id="temps_tache_heure">
+                <span class="petit">h</span>
+                <input type="number" placeholder="Min" id="temps_tache_min">
+                <span class="petit">min</span>
+            </div>
+            <div class="div_pourcentage_sett sett">
+                <span>Avancement : </span>
+                <input type="number" placeholder="60" id="pourcentage_tache">
+                <span>%</span>
+            </div>
+            <div class="div_contrib_sett sett">
+                <span class="contributer_sett">Contributeurs :</span>
+                <input type="text" placeholder="Mark Delafoce" id="contributeurs_tache">
+                <div class="div_recherche_resultat">
+                    <div class="div_result">David</div>
+                    <div class="div_result">Claire</div>
+                    <div class="div_result">Maxens</div>
+                </div>
+                <div class="div_list_people">
+                </div>
+            </div>
+            <div class="div_new">
+                <div class="div_acept_event">OK</div>
+            </div>
+        </div>
+    </div>
 </body>
 <script>
-
+    const workspace = document.querySelector(".workspace");
+    const div_menu = document.querySelector(".div_menu");
     let temps_vise = 13.5;
 
     const endpointOptions_in = {
@@ -27,7 +72,7 @@
         isTarget: false,
         maxConnections: -1,
         endpoint: ["Dot", { radius: 5 }],
-        paintStyle: { fill: "var(--brun)" },
+        paintStyle: { fill: "var(--transparent)" },
         connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
         connector: ["Bezier", { curviness: 50 }],
         cssClass: "endpoint-in",
@@ -46,8 +91,8 @@
         isSource: false,
         isTarget: true,
         maxConnections: -1,
-        endpoint: ["Rectangle", { width: 5, height: 30 }],
-        paintStyle: { fill: "var(--text-color)" },
+        endpoint: ["Rectangle", { width: 20, height: 50 }],
+        paintStyle: { fill: "var(--transparent)" },
         connectorStyle: { stroke: "red", strokeWidth: 2 },
         connector: ["Bezier", { curviness: 50 }],
         overlays: [
@@ -62,22 +107,14 @@
         connectorClass: "connector-class"  // Class for connectors
     };
 
-
     jsPlumb.ready(function () {
         (async function () {
             await get_project_settings();
+            await get_all_project_tasks(1);
         })();
-        jsPlumb.setContainer(document.body);
+        jsPlumb.setContainer(workspace);
 
         setTimeout(() => {
-            create_tache("t1", '1', 1, 100, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t2", '2', 1.8, 90, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t3", '3', 0.5, 89, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t4", '4', 0.5, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t5", '5', 2, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t6", '6', 2, 0, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-            create_tache("t7", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp']);
-
             jsPlumb.bind("connection", function (info) {
                 const connection = info.connection;
                 info.id = "connection_" + connection.sourceId + "_" + connection.targetId;
@@ -146,6 +183,120 @@
 
     });
 
+    function open_menu(selected) {
+        // supprimer la class selected
+        document.querySelectorAll('.selected').forEach(bloc => {
+            bloc.classList.remove('selected');
+        });
+
+        selected.classList.add('selected');
+        div_menu.classList.add('selected');
+        div_menu.classList.remove('unselected');
+        let time = selected.getAttribute('data-time');
+        let progress = selected.getAttribute('data-progress');
+        let titre = selected.querySelector('h2').textContent;
+        let description = selected.querySelector('p').textContent;
+
+        let jour = Math.floor(time/24);
+        let heure = Math.floor(time%24);
+        let min = Math.round((time % 1) * 60);
+
+        let contributeurs = selected.querySelector('.div_list_people').children;
+
+        
+        div_menu.style.display = 'flex';
+        div_menu.querySelector('#titre_tache').value = titre;
+        div_menu.querySelector('#titre_tache').focus();
+        div_menu.querySelector('#description_tache').value = description;
+        div_menu.querySelector('#temps_tache_jour').value = jour;
+        div_menu.querySelector('#temps_tache_heure').value = heure;
+        div_menu.querySelector('#temps_tache_min').value = min;
+        div_menu.querySelector('#pourcentage_tache').value = progress;
+
+
+        div_menu.setAttribute('data-selected', selected.id);
+    }
+    
+    function closed_menu() {
+        document.querySelectorAll('.selected').forEach(bloc => {
+            bloc.classList.remove('selected');
+        });
+        div_menu.style.display = 'flex';
+        div_menu.querySelector('#titre_tache').value = "";
+        div_menu.querySelector('#description_tache').value = "";
+        div_menu.querySelector('#temps_tache_jour').value = "";
+        div_menu.querySelector('#temps_tache_heure').value = "";
+        div_menu.querySelector('#temps_tache_min').value = "";
+        div_menu.querySelector('#pourcentage_tache').value = "";
+        div_menu.classList.add('unselected');
+        div_menu.classList.remove('selected');
+        div_menu.setAttribute('data-selected', "");
+    }
+    
+    div_menu.querySelector(".div_acept_event").addEventListener('click', function () {
+        let titre = div_menu.querySelector('#titre_tache').value;
+        let description = div_menu.querySelector('#description_tache').value;
+        let jour = div_menu.querySelector('#temps_tache_jour').value;
+        let heure = div_menu.querySelector('#temps_tache_heure').value;
+        let min = div_menu.querySelector('#temps_tache_min').value;
+        let pourcentage = div_menu.querySelector('#pourcentage_tache').value;
+        let contributeurs = div_menu.querySelector('#contributeurs_tache').value;
+        let link_ressources = '{"resources1":"https://www.google.com","resources2":"https://www.google.com"}';
+
+        let selected = document.getElementById(div_menu.getAttribute('data-selected'));
+        selected.querySelector('h2').textContent = titre;
+        selected.querySelector('p').textContent = description;
+        selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60);
+        selected.setAttribute('data-time', parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60);
+        selected.setAttribute('data-progress', pourcentage);
+
+        let etat = '';
+        if (pourcentage > 0 && pourcentage < 100) {
+            selected.querySelector('.div_etat').textContent = 'En cours';
+            etat = 'En cours';
+        } else if (pourcentage == 100) {
+            selected.querySelector('.div_etat').textContent = 'Terminé';
+            etat = 'Terminé';
+        } else {
+            selected.querySelector('.div_etat').textContent = 'En attente';
+            etat = 'En attente';
+        }
+
+        // selected.querySelector('.div_etat').textContent = 'En cours';
+        // selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour) + parseFloat(heure) / 24 + parseFloat(min) / 1440);
+        update_task(selected.id,titre,parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60,pourcentage,etat,description,'{}',link_ressources,'{}');
+        get_all_time();
+    });
+
+    div_menu.querySelector(".div_supp_event").addEventListener('click', function () {
+        let selected = document.getElementById(div_menu.getAttribute('data-selected'));
+        count = 0;
+        while (count < 1000) {
+            let all_connections = jsPlumb.getAllConnections();
+
+            if (all_connections.length === 0) {
+                break;
+            }
+
+            all_connections.forEach(connection => {
+                if (connection.sourceId === selected.id || connection.targetId === selected.id) {
+                    try {
+                        jsPlumb.deleteConnection(connection);
+                    } 
+                    catch (error) {
+                    }
+                }
+            });
+            count++;
+        }
+        jsPlumb.remove(selected);
+        let blocs = JSON.parse(localStorage.getItem('blocs'));
+        delete blocs[selected.id];
+        localStorage.setItem('blocs', JSON.stringify(blocs));
+        get_all_time();
+        closed_menu();
+    });
+
     function convert_float_to_hours(float_hour) {
         const hours = Math.floor(float_hour);
         const minutes = Math.round((float_hour % 1) * 60);
@@ -154,18 +305,17 @@
     function create_tache(id, titre, temps, pourcentage, etat, description, contributeur,event=null) {
         // Créer les éléments HTML
         const newBloc = document.createElement('div');
-        const divGestion = document.createElement('div');
+        const divGestion = document.createElement('div');   
         const divEtat = document.createElement('div');
         const divTemps = document.createElement('div');
         const h2Titre = document.createElement('h2');
         const pDescription = document.createElement('p');
         const divListPeople = document.createElement('div');
         const divBtnClose = document.createElement('div');
-
         // Définir les classes et IDs
+        console.log(id);
         newBloc.id = id;
         let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
-
         if (actual_localStorage[id]) {
             newBloc.style.top = actual_localStorage[id].position.y + 'px';
             newBloc.style.left = actual_localStorage[id].position.x + 'px';
@@ -174,9 +324,10 @@
                 newBloc.style.height = '0px';
                 newBloc.style.width = '250px';
                 newBloc.style.padding = '0px 25px 0px 25px';
-                divBtnClose.style.transform = 'translateX(-100%) translateY(-5px) rotate(180deg)';
+                divBtnClose.style.transform = 'rotate(180deg) translateX(-50%)';
+                divBtnClose.style.borderRadius = '0 0 5px 5px';
                 // display none pour les enfants
-                h2Titre.style.display = 'none';
+                h2Titre.style.opacity = '0';
                 pDescription.style.display = 'none';
                 divListPeople.style.display = 'none';
 
@@ -199,6 +350,10 @@
             newBloc.style.left = event.clientX + 'px';
         }
 
+        newBloc.addEventListener('dblclick', function () {
+            open_menu(newBloc);
+        });
+
         divBtnClose.className = 'btn_close';
         divGestion.className = 'div_gestion';
         divEtat.className = 'div_etat';
@@ -212,13 +367,14 @@
         pDescription.textContent = description;
         divBtnClose.textContent = '△';
 
-        // Ajouter les contributeurs
-        contributeur.forEach(c => {
+
+        contributeur = JSON.parse(contributeur);
+        for (const [key, value] of Object.entries(contributeur)) {
             const divPeople = document.createElement('div');
             divPeople.className = 'people';
-            divPeople.textContent = c;
+            divPeople.textContent = value.slice(0, 2);
             divListPeople.appendChild(divPeople);
-        });
+        }
 
         // Construire la structure
         divGestion.appendChild(divEtat);
@@ -236,40 +392,37 @@
 
             if (newBloc.style.height !== '0px') {
                 newBloc.style.height = '0px';
-                newBloc.style.width = '250px';
+                // newBloc.style.width = '250px';
                 newBloc.style.padding = '0px 25px 0px 25px';
                 // display none pour les enfants
-                h2Titre.style.display = 'none';
+                h2Titre.style.opacity = '0';
                 pDescription.style.display = 'none';
                 divListPeople.style.display = 'none';
-                divBtnClose.style.transform = 'translateX(-100%) translateY(-5px) rotate(180deg)';
+                divBtnClose.style.transform = 'rotate(180deg) translateX(-50%)';
+                divBtnClose.style.borderRadius = '0 0 5px 5px';
 
                 // les point d'accroche les remonter de 150px
-                jsPlumb.selectEndpoints({ element: newBloc.id }).each(function (endpoint) {
-                    endpoint.anchor.y = 0;
-                });
                 jsPlumb.repaintEverything();
                 actual_localStorage[newBloc.id].position = {
                     x: parseFloat(newBloc.style.left),
                     y: parseFloat(newBloc.style.top),
                     closed: true
                 };
+                
 
             } else {
                 newBloc.style.height = '';
                 newBloc.style.width = '';
                 newBloc.style.padding = '15px 25px 5px 25px';
                 // display none pour
-                h2Titre.style.display = 'flex';
+                h2Titre.style.opacity = '1';
                 pDescription.style.display = 'flex';
                 divListPeople.style.display = 'flex';
-                divBtnClose.style.transform = '';
+                divBtnClose.style.transform = 'translateX(50%)';
+                divBtnClose.style.borderRadius = '5px 5px 0 0';
 
                 // remettre les point d'accroche à leur place
-                
-                jsPlumb.selectEndpoints({ element: newBloc.id }).each(function (endpoint) {
-                    endpoint.anchor.y = 0.5;
-                });
+    
                 jsPlumb.repaintEverything();
                 actual_localStorage[newBloc.id].position = {
                     x: parseFloat(newBloc.style.left),
@@ -283,7 +436,8 @@
         });
 
         // Ajouter au document et configurer jsPlumb
-        document.body.appendChild(newBloc);
+        workspace.appendChild(newBloc);
+        console.log(newBloc.id);
         jsPlumb.addEndpoint(newBloc.id, { anchors: "LeftMiddle" }, endpointOptions_out);
         jsPlumb.addEndpoint(newBloc.id, { anchors: "RightMiddle" }, endpointOptions_in);
 
@@ -324,7 +478,6 @@
     function add_time_left(parent, time, liste_path) {
         // si le parent a déjà un div_time_left, on le supprime
         if (parent.querySelector('.div_time_left')) {
-            console.log('remove');
             parent.querySelector('.div_time_left').remove();
         }
         const divTimeLeft = document.createElement('div');
@@ -406,7 +559,7 @@
     }
 
     function get_all_time() {
-        console.log('get_all_time');
+        // console.log('get_all_time');
         let json_layer = {}
         let sourceDepthMap = {};
 
@@ -463,7 +616,7 @@
                 });
             }
         });
-        console.log(json_layer);
+        // console.log(json_layer);
         Object.keys(json_layer).forEach(layer => {
             json_layer[layer].forEach(elem => {
                 if (elem.visited) {
@@ -527,7 +680,7 @@
 
                 document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
             });
-
+        jsPlumb.repaintEverything();
     }
 
     async function save_project_settings(auto = true) {
@@ -584,9 +737,106 @@
         }
     }
 
+    async function add_task(title, duree_theorique, pourcentage_avancemennt, materiels, description, contributeurs,id_project,link_ressources,e) {
+        if (pourcentage_avancemennt> 0 && pourcentage_avancemennt < 100) {
+            etat = 'En cours';
+        } else if (pourcentage_avancemennt == 100) {
+            etat = 'Terminé';
+        } else {
+            etat = 'En attente';
+        }
+        const response = await fetch('/carte/add_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                duree_theorique: duree_theorique,
+                pourcentage_avancemennt: pourcentage_avancemennt,
+                materiels: materiels,
+                description: description,
+                contributeurs: contributeurs,
+                id_project: id_project,
+                link_ressources: link_ressources,
+                etat: etat
+            })
+        });
+        const data = await response.json();
+        if (data.success) {
+            data.tasks.forEach(task => {
+                console.log(task);
+                let newB = create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs,e);
+                open_menu(newB);
+            });
+            console.log('Task added successfully');
+        } else {
+            console.error('Error adding task:', data.message);
+        }
+        
+    }
+
+    async function get_all_project_tasks(id_project) {
+        const response = await fetch('/carte/get_all_project_tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id_project: id_project
+            })
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+            data.tasks.forEach(task => {
+                console.log(task);
+                create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs);
+            });
+        } else {
+            console.error('Error adding task:', data.message);
+        }
+        
+    }
+    
+    async function update_task(id,titre,temps,pourcentage,etat,description,contributeurs,link_ressources,materiels) {
+        const response = await fetch('/carte/update_task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: id,
+                title: titre,
+                duree_theorique: temps,
+                pourcentage_avancemennt: pourcentage,
+                etat: etat,
+                description: description,
+                contributeurs: contributeurs,
+                link_ressources: link_ressources,
+                materiels: materiels
+            })
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log('Task updated successfully');
+        } else {
+            console.error('Error updating task:', data.message);
+        }
+        
+    }
+
     document.addEventListener('mousedown', function (e) {
+        
         if (e.ctrlKey && e.altKey) {
-            create_tache("t8", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', ['Dp', 'Gp', 'Cp'],e);
+            let url_param = new URLSearchParams(window.location.search);
+            let id = url_param.get('project');
+            if (id) {
+                // create_tache("t8", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', "{}",e);
+                add_task('', 0, 0, '{}', '', '{}',id,'{}',e);
+            }
+        }else if (!e.target.closest('.div_menu')) {
+            closed_menu();
         }
     });
 

@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@editorjs/editorjs": "^2.30.7",
+    "@jsplumb/browser-ui": "^6.2.10",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
@@ -19,6 +20,7 @@
     "crypto": "^1.0.1",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "jsplumb": "^2.15.6",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.12.0",
