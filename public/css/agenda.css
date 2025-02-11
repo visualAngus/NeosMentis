@@ -27,7 +27,7 @@ main{
     border-radius: 20px;
     padding: 5px;
     transform: translateY(-5%);
-    background-color: var(--text-color);
+    background-color: var(--white);
 
     display: flex;
     flex-direction: column;
@@ -38,7 +38,8 @@ main{
     position: relative;
 
 
-    border: 1px solid var(--noir-petit);
+    box-shadow: 5px 5px 10px -0px var(--blue-shadow);
+
 }
 .div_control{
     width: 100%;
@@ -66,14 +67,6 @@ main{
     overflow: auto;
     overflow-x: hidden;
 }
-.div_agenda_ctrl::-webkit-scrollbar {
-    width: 10px;
-}
-.div_agenda_ctrl::-webkit-scrollbar-thumb {
-    background-color: var(--noir-petit);
-    border-radius: 10px;
-}
-
 
 .div_heures{
     width: 50px;
@@ -92,14 +85,14 @@ main{
     justify-content: flex-start;
     font-size: 0.8em;
     font-weight: 500;
-    color: var(--noir);
+    color: var(--text-color);
     border-radius: 5px;
 }
 .div_heure::before{
     content: "";
     width: 100vw;
     height: 1px;
-    background-color: var(--noir-petit);
+    background-color: var(--gray-opacity);
     margin-top: 5px;
     transform: translateX(calc(50% + 25px));
 }
@@ -127,10 +120,10 @@ main{
     position: relative;
     z-index: 5;
 
-    border-left: 1px solid var(--noir-petit);
+    border-left: 1px solid var(--gray-opacity);
     padding: 5px;
 
-    transition: all var(--transition);
+    transition: all 0.2s var(--transition);
 }
 .div_add_event{
     width: 100%;
@@ -143,7 +136,7 @@ main{
 
     font-size: 1em;
     font-weight: 600;
-    background-color: var(--bleu-overlay);
+    background-color: var(--blue-overlay);
     border-radius: 0px;
 
     transform: translateX(-5px) translateY(5px);
@@ -165,7 +158,7 @@ main{
 
     font-size: 1em;
     font-weight: 500;
-    color: var(--noir);
+    color: var(--text-color);
     border-radius: 5px;
 
     z-index: 50;
@@ -198,16 +191,16 @@ main{
     gap: 5px;
     margin: 5px;
 
-    transition: box-shadow var(--transition);
-    box-shadow: 1.2px 1.2px 1px var(--noir-shadow);
+    transition: box-shadow 0.3s var(--transition);
+    box-shadow: 1.2px 1.2px 1px var(--blue-shadow);
     cursor: pointer;
     z-index: 30;
 
     user-select: none;
 
-    color: white;
+    color: var(--white);
 
-    border: 1.5px solid var(--noir-petit);
+    border: 1.5px solid var(--gray-opacity);
 
     overflow: hidden;
 
@@ -216,10 +209,10 @@ main{
 }
 .div_event:hover{
     z-index: 1000;
-    box-shadow: 20px 20px 10px var(--noir-shadow);
+    box-shadow: 20px 20px 10px var(--blue-shadow);
 }
 .div_event:active{
-    box-shadow: 10px 10px 5px var(--noir-shadow);
+    box-shadow: 10px 10px 5px var(--blue-shadow);
 }
 
 
@@ -229,12 +222,12 @@ main{
     width: 85%;
     margin-left: 5px;
     height: 7.5px;
-    background-color: var(--bleu);
+    background-color: var(--blue);
     z-index: 10000;
 
     border-radius: 5px;
 
-    box-shadow: 3px 3px 4px var(--noir-shadow);
+    box-shadow: 3px 3px 4px var(--blue-shadow);
 }
 
 .titre_event{
@@ -260,13 +253,13 @@ main{
 
 .date-picker {
     padding: 10px;
-    border: 1px solid var(--bleu);
+    border: 1px solid var(--blue);
     border-radius: 5px;
     font-size: 16px;
 }
 
 .div_control button {
-    color: var(--noir);
+    color: var(--text-color);
     border: none;
     border-radius:50%;
     aspect-ratio: 1/1;
@@ -282,7 +275,7 @@ main{
 }
 
 .div_control button:hover {
-    background-color: var(--bleu);
+    background-color: var(--blue);
 }
 
 .selected-date {
@@ -291,8 +284,8 @@ main{
     text-align: center;
 }
 .btn_ajd{
-    background-color:var(--gris-opacity);
-    color: var(--noir);
+    background-color:var(--gray-opacity);
+    color: var(--text-color);
     padding: 10px;
     font-weight: 600;
     border-radius: 5px;
@@ -306,7 +299,7 @@ main{
     font-style: normal;
 }
 .btn_ajd:hover{
-    background-color: var(--bleu);
+    background-color: var(--blue);
 
 }
 
@@ -314,12 +307,12 @@ main{
 .div_popup,.div_popup_add_event{
     position: absolute;
     width: 500px;
-    background-color: var(--text-color);
+    background-color: var(--white);
     z-index: 100000;
 
     border-radius: 20px;
     padding: 10px;
-    box-shadow: var(--noir-shadow) 0px 5px 10px;
+    box-shadow: var(--blue-shadow) 0px 5px 10px;
     display: none;
     flex-direction: column;
     align-items: flex-start;
@@ -336,7 +329,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -345,7 +338,7 @@ main{
     font-size: 1em;
 
     padding: 0 10px;
-    border-right: 1px solid var(--noir-petit);
+    border-right: 1px solid var(--light-gris);
 
     width: 150px;
 }
@@ -353,7 +346,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -366,7 +359,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -379,7 +372,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -392,7 +385,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -404,7 +397,7 @@ main{
 .btn_add{
     outline: none;
     border: none;
-    background-color: var(--contrast-vert);
+    background-color: var(--green-soft);
     color: var(--text-color);
     padding: 10px;
     font-weight: 600;
@@ -417,17 +410,17 @@ main{
     font-size: 0.8em;
     cursor: pointer;
 
-    transition: background-color var(--transition);
+    transition: background-color 0.3s var(--transition);
 
     position: absolute;
     bottom: 10px;
     right: 10px;
 }
 .btn_add:hover{
-    background-color: var(--light-gris);
+    background-color: var(--green-middle-soft);
 }
 .btn_add:active{
-    background-color: var(--contrast-vert);
+    background-color: var(--green-middle-dark);
 }
 
 .parent_time_start,.parent_time_end{
@@ -478,13 +471,29 @@ main{
 
     padding-left: 15px;
 }
+.titre_event{
+    color: var(--white);
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 1.35em;
+}
+.heure_event{
+    color: var(--white);
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1em;
+}
 #titre_event_pop{
     width: 100%;
     height: 30px;
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -506,7 +515,7 @@ main{
     border: none;
     outline: none;
     text-align: left;
-    color: var(--noir);
+    color: var(--text-color);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -546,7 +555,7 @@ main{
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
     font-style: normal;
-    color: var(--noir);
+    color: var(--text-color);
 }
 .description_pop h4,.localistion_pop h4,.groupe_pop h4{
     font-weight: 600;
@@ -571,7 +580,7 @@ main{
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
     font-style: normal;
-    color: var(--noir);
+    color: var(--text-color);
 
     padding: 10px;
     padding-left: 25px;
@@ -586,10 +595,10 @@ main{
 }
 .document_link_pop a,.link_pop a{
     text-decoration: none;
-    color: var(--noir);
-    transition: all var(--transition);
+    color: var(--text-color);
+    transition: all 0.3s var(--transition);
 }
 .document_link_pop a:hover,.link_pop a:hover{
-    color: var(--bleu);
+    color: var(--blue);
     text-decoration: underline;
 }

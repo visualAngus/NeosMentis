@@ -1,0 +1,105 @@
+:root {
+    --green-soft: #d9ebd9;
+    --green-soft-shadow: #d9ebd9a3;
+    --green-middle-soft: #C5E1C5;
+    --green-middle: #6da96d;
+    --green-middle-dark: #4F9454;
+    --green-dark: #2f5a32;
+    
+
+    --blue: #c3d6df;
+    --blue-overlay: #3b8ce92f;
+    --blue-shadow: #1a233796;
+    --blue-shadow-soft: #1a23373f;
+    --blue-dark: #1a2337;
+
+    --red-soft: #d8adad;
+    --red-middle-soft: #ce6466;
+    --red-dark: #e02323;
+
+    --orange-soft: #e0c1a3;
+    --orange-middle-soft: #e0c1a3;
+    --orange-dark: #f59228;
+
+    --text-color: #000000;
+    --black-near: #29202b;
+
+    --gray-ultra-light: #f5f5f5;
+    --gray-light: #9c9c9c;
+    --gray-dark: #333333;
+    --gray-opacity: #4a4a4a3d;
+
+    --white: #ffffff;
+    --white-opacity: #ffffff67;
+    --transparent: transparent;
+
+    --transition: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --border-radius: 15px;
+
+    --rouge-ok: #eb4444;
+    --orange-ok: #f3a531;
+    --vert-ok: #6bbd72;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -moz-user-select: none;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-dark) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--gray-dark);
+    border-radius: 10px;
+}
+
+.load_div {
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    background-color: var(--text-color);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    transition: all var(--transition);
+}
+
+.loader {
+    width: 45px;
+    height: 40px;
+    background: linear-gradient(#0000 calc(1*100%/6), #fff 0 calc(3*100%/6), #0000 0),
+        linear-gradient(#0000 calc(2*100%/6), #fff 0 calc(4*100%/6), #0000 0),
+        linear-gradient(#0000 calc(3*100%/6), #fff 0 calc(5*100%/6), #0000 0);
+    background-size: 10px 400%;
+    background-repeat: no-repeat;
+    animation: matrix 1s infinite linear;
+}
+
+@keyframes matrix {
+    0% {
+        background-position: 0% 100%, 50% 100%, 100% 100%
+    }
+
+    100% {
+        background-position: 0% 0%, 50% 0%, 100% 0%
+    }
+}

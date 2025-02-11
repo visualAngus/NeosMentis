@@ -40,6 +40,8 @@ async function get_all_user_info() {
         localStorage.setItem('home_settings', JSON.stringify(settings.home_settings));
         localStorage.setItem('style_settings', JSON.stringify(settings.style_settings));
 
+        list_notif_texte.push("Bienvenue "+data.data.username);
+
     } else {
         console.error('Error fetching users:', data.message);
     }

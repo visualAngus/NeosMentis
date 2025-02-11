@@ -11,7 +11,9 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const WebSocket = require('ws');
 const http = require('http');
-const { v4: uuidv4 } = require('uuid'); 
+const { v4: uuidv4 } = require('uuid');
+
+
 
 
 // Clé secrète pour signer les tokens JWT
@@ -65,7 +67,7 @@ const upload = multer({ storage: storage });
 
 
 app.get('/', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         res.redirect('/log');
     } else {
@@ -74,7 +76,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/editor', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -82,7 +84,7 @@ app.get('/editor', (req, res) => {
     res.sendFile('./public/html/editor.html', { root: __dirname })
 });
 app.get('/editor2', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -90,7 +92,7 @@ app.get('/editor2', (req, res) => {
     res.sendFile('./public/html/editorv2.html', { root: __dirname })
 });
 app.get('/agenda', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -98,7 +100,7 @@ app.get('/agenda', (req, res) => {
     res.sendFile('./public/html/agenda.html', { root: __dirname })
 });
 app.get('/carte', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -133,7 +135,7 @@ app.post('/save_document', (req, res) => {
     const id = req.body.id;
     const title = req.body.title;
 
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -152,14 +154,14 @@ app.post('/save_document', (req, res) => {
         const currentDate = new Date();
         currentDate.setHours(currentDate.getHours() + 1);
         const currentTimestamp = currentDate.toISOString().replace('T', ' ').substring(0, 19);
-        connection.query('UPDATE documents SET content = ?, iv = ?,authTag = ?, title = ?, last_modified = ? WHERE id = ?', 
+        connection.query('UPDATE documents SET content = ?, iv = ?,authTag = ?, title = ?, last_modified = ? WHERE id = ?',
             [encryptedData.encryptedData, encryptedData.iv, encryptedData.authTag, title, currentTimestamp, id, data.userID], (error, _results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
 
-            return res.json({ success: true, message: 'Document saved successfully' });
-        });
+                return res.json({ success: true, message: 'Document saved successfully' });
+            });
     });
 });
 
@@ -169,18 +171,18 @@ app.get('/create_document', (req, res) => {
     if (!data) {
         return res.redirect('/log');
     }
-    
+
     // recupérer la clef de l'utilisateur
-    
+
     const secondaryKey = Buffer.from(req.cookies.secondaryKey, 'hex');
     const docIdentifier = crypto.randomBytes(32).toString('hex');
-    
+
     const docKey = generateDocumentKey(SECRET_KEY, docIdentifier);
-    
+
     const encryptedDocKey = encryptWithSecondaryKey(docKey.toString('hex'), secondaryKey);
 
     const dataEncripted = encryptDocument(' ', secondaryKey, encryptedDocKey);
-    
+
     console.log("dataEncripted:", dataEncripted);
     connection.query('INSERT INTO documents SET title = "New document", user_id_link = ?, content = ? , iv = ?, authTag = ?',
         [data.userID, dataEncripted.encryptedData, dataEncripted.iv, dataEncripted.authTag], (error, _results) => {
@@ -197,13 +199,13 @@ app.get('/create_document', (req, res) => {
 });
 
 app.post('/documents', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
     const id = req.body.id;
 
-    
+
     connection.query('SELECT * FROM documents WHERE id = ?', [id], (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
@@ -218,35 +220,35 @@ app.post('/documents', (req, res) => {
             }
             // Decrypt the key
             const secondaryKey = Buffer.from(req.cookies.secondaryKey, 'hex');
-    
+
             const decryptedContent = decryptDocument(results_[0], secondaryKey, results[0]);
             results[0].content = decryptedContent;
-            
+
             return res.json({ success: true, documents: results });
         });
     });
 });
 
 app.get('/documents_by_user', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
-    connection.query( `SELECT documents.id,documents.title,documents.last_modified 
+    connection.query(`SELECT documents.id,documents.title,documents.last_modified 
                         FROM key_link 
                         LEFT JOIN documents ON key_link.document_id_link = documents.id
                         WHERE key_link.user_id_link = ? 
                         ORDER BY last_modified DESC`
         , [data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, documents: results });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, documents: results });
+        });
 });
 
 app.post('/delete_document', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -267,7 +269,7 @@ app.post('/delete_document', (req, res) => {
 });
 
 app.post('/partage_document', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -285,17 +287,17 @@ app.post('/partage_document', (req, res) => {
 
         connection.query('INSERT INTO partages (document_id_link, sender_id, receiver_id, encryptedData, iv, authTag) VALUES (?, ?, ?, ?, ?, ?)',
             [id_doc, data.userID, id_user, text.encryptedData, text.iv, text.authTag], (error, _results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
 
-            return res.json({ success: true, message: 'Document shared successfully' });
-        }); 
+                return res.json({ success: true, message: 'Document shared successfully' });
+            });
     });
 });
 
 app.get('/accepter_les_partages', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -317,15 +319,15 @@ app.get('/accepter_les_partages', (req, res) => {
 
             connection.query('INSERT INTO key_link (user_id_link, document_id_link, encryptedData, iv, authTag) VALUES (?, ?, ?, ?, ?)',
                 [data.userID, encryptKey.document_id_link, encryptedDocKey.encryptedData, encryptedDocKey.iv, encryptedDocKey.authTag], (error, _results) => {
-                if (error) {
-                    return res.json({ success: false, message: error.message });
-                }
-                connection.query('DELETE FROM partages WHERE id_partage = ?', [encryptKey.id_partage], (error, _results) => {
                     if (error) {
                         return res.json({ success: false, message: error.message });
                     }
+                    connection.query('DELETE FROM partages WHERE id_partage = ?', [encryptKey.id_partage], (error, _results) => {
+                        if (error) {
+                            return res.json({ success: false, message: error.message });
+                        }
+                    });
                 });
-            });
         }
         return res.json({ success: true, message: 'Documents shared successfully' });
     });
@@ -335,42 +337,42 @@ app.get('/log', (req, res) => {
     res.sendFile('./public/html/log.html', { root: __dirname })
 });
 
-app.post('/register', async(req, res) => {
+app.post('/register', async (req, res) => {
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
 
     const hash = await hashPassword(password);
-    connection.query('INSERT INTO users (user_name, email, user_password) VALUES (?, ?, ?)', 
+    connection.query('INSERT INTO users (user_name, email, user_password) VALUES (?, ?, ?)',
         [username, email, hash], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        connection.query('INSERT INTO user_settings (user_id_link) VALUES (?)', [results.insertId], (error, _results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
-            console.log('User registered successfully');
-            // create a secondary key
-            const secondaryKey = generateSecondaryKey(SECRET_KEY, password);
-            // create a token
-            const token = generateToken(username, results.insertId);
-            // set the token in the cookie
-            res.cookie('token', token, { httpOnly: true });
-            // set the secondary key in the cookie
-            res.cookie('secondaryKey', secondaryKey.toString('hex'), { httpOnly: true });
-            res.cookie('username', username, { httpOnly: true });
-            return res.json({ success: true, message: 'User registered successfully' });
-        });
+            connection.query('INSERT INTO user_settings (user_id_link) VALUES (?)', [results.insertId], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                console.log('User registered successfully');
+                // create a secondary key
+                const secondaryKey = generateSecondaryKey(SECRET_KEY, password);
+                // create a token
+                const token = generateToken(username, results.insertId);
+                // set the token in the cookie
+                res.cookie('token', token, { httpOnly: true });
+                // set the secondary key in the cookie
+                res.cookie('secondaryKey', secondaryKey.toString('hex'), { httpOnly: true });
+                res.cookie('username', username, { httpOnly: true });
+                return res.json({ success: true, message: 'User registered successfully' });
+            });
 
-    });
+        });
 });
 
-app.post('/login', async(req, res) => {
+app.post('/login', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    connection.query('SELECT * FROM users WHERE user_name = ?', [username], async(error, results) => {
+    connection.query('SELECT * FROM users WHERE user_name = ?', [username], async (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
@@ -400,26 +402,79 @@ app.post('/login', async(req, res) => {
 });
 
 app.get('/get_all_user_info', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
-    connection.query('SELECT home_settings,style_settings FROM user_settings WHERE user_id_link = ?', [data.userID], async(error, results) => {
+
+    let currentDate = new Date();
+    currentDate.setHours(0, 1, 0, 0);
+    currentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+
+    let twoWeeksLater = new Date();
+    twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+    twoWeeksLater.setHours(23, 59, 59, 999);
+    twoWeeksLater = twoWeeksLater.toISOString().slice(0, 19).replace('T', ' ');
+
+    connection.query('SELECT home_settings,style_settings FROM user_settings WHERE user_id_link = ?', [data.userID], async (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
 
         if (results.length === 0) {
-            return res.json({ success: true, data: data});
+            return res.json({ success: true, data: data });
         }
         results[0].home_settings = JSON.parse(results[0].home_settings);
         results[0].style_settings = JSON.parse(results[0].style_settings);
+        connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND startTime BETWEEN ? AND ? ORDER BY startTime",
+            [data.userID, currentDate, twoWeeksLater], (error, results__) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                connection.query(`SELECT documents.id,documents.title,documents.last_modified 
+                    FROM key_link 
+                    LEFT JOIN documents ON key_link.document_id_link = documents.id
+                    WHERE key_link.user_id_link = ? 
+                    ORDER BY last_modified DESC`
+                    , [data.userID], (error, results) => {
+                        if (error) {
+                            return res.json({ success: true, data: data, settings: results[0], events: results__, documents: [] , projects: []});
+                        }
+                        connection.query(`SELECT projects_key_link.project_id_link as id, projects.title, projects.last_modified
+                            FROM projects_key_link
+                            LEFT JOIN projects ON projects_key_link.project_id_link = projects.id_project 
+                            WHERE projects_key_link.user_id_link = ?`, [data.userID], (error, results_pro) => {
+                        if (error) {
+                            return res.json({ success: true, data: data, settings: results[0], events: results__, documents: results , projects: []});
+                        }
+                        return res.json({ success: true, data: data, settings: results[0], events: results__, documents: results , projects: results_pro});
+                    });
 
-        return res.json({ success: true, data: data, settings : results[0]});
+
+                    });
+            });
+
+
+    });
+});
+app.get('/get_all_user_info_only', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    connection.query('SELECT user_name as username FROM users WHERE user_id = ?', [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+        return res.json({ success: true, data: results[0]});
     });
 });
 app.post('/save_user_settings', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -427,12 +482,12 @@ app.post('/save_user_settings', (req, res) => {
     const style_settings = JSON.stringify(req.body.style_settings);
     connection.query('UPDATE user_settings SET home_settings = ?, style_settings = ? WHERE user_id_link = ? ',
         [home_settings, style_settings, data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
 
-        return res.json({ success: true, message: 'Settings saved successfully' });
-    });
+            return res.json({ success: true, message: 'Settings saved successfully' });
+        });
 });
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
@@ -459,7 +514,7 @@ app.get('/agenda/agenda_events', (req, res) => {
                 acc[date] = [];
             }
             acc[date].push({
-                id: "ev"+event.id_event.toString(),
+                id: "ev" + event.id_event.toString(),
                 title: event.title,
                 startTime: event.startTime,
                 endTime: event.endTime,
@@ -482,7 +537,7 @@ app.post('/agenda/save_agenda_event', (req, res) => {
     }
     const id = req.body.id;
     const title = req.body.title;
-    const startDate= req.body.startDate;
+    const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const group = req.body.group;
     const color = req.body.color;
@@ -492,19 +547,19 @@ app.post('/agenda/save_agenda_event', (req, res) => {
     if (id) {
         connection.query("UPDATE agenda_events SET title = ?, startTime = ?, endTime = ?, group_id_link = ?, color = ?, linkedItems = ?, location = ?, description = ? WHERE id_event = ? AND user_id_link = ?",
             [title, startDate, endDate, group, color, linkedItems, location, description, id, data.userID], (error, _results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
-            return res.json({ success: true, message: 'Event updated successfully' });
-        });
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Event updated successfully' });
+            });
     } else {
         connection.query("INSERT INTO agenda_events (title, startTime, endTime, group_id_link, color, linkedItems, location, description, user_id_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [title, startDate, endDate, group, color, linkedItems, location, description, data.userID], (error, _results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
-            return res.json({ success: true, message: 'Event created successfully' });
-        });
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Event created successfully' });
+            });
     }
 });
 
@@ -536,16 +591,16 @@ app.get('/agenda/2weeks', (req, res) => {
 
     connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND startTime BETWEEN ? AND ? ORDER BY startTime",
         [data.userID, currentDate, twoWeeksLater], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, events: results });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, events: results });
+        });
 });
 
 
 app.post('/carte/save_carte_settings', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -557,24 +612,24 @@ app.post('/carte/save_carte_settings', (req, res) => {
                             JOIN projects_key_link ON projects.id_project = projects_key_link.project_id_link 
                             SET projects.settings_connection = ?, projects.settings_bloc = ? 
                             WHERE projects_key_link.user_id_link = ?`,
-            [carte_connections,carte_blocs, data.userID], (error) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
+            [carte_connections, carte_blocs, data.userID], (error) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
 
-            return res.json({ success: true, message: 'Settings saved successfully' });
-        });
+                return res.json({ success: true, message: 'Settings saved successfully' });
+            });
     } catch (error) {
         return res.json({ success: false, message: 'Invalid data format' });
     }
 });
 
 app.get('/carte/get_carte_settings', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
-    connection.query(`SELECT projects.settings_connection, projects.settings_bloc 
+    connection.query(`SELECT projects.settings_connection, projects.settings_bloc ,projects.date_start
                         FROM projects 
                         JOIN projects_key_link ON projects.id_project = projects_key_link.project_id_link 
                         WHERE projects_key_link.user_id_link = ?`, [data.userID], (error, results) => {
@@ -591,7 +646,7 @@ app.get('/carte/get_carte_settings', (req, res) => {
 });
 
 app.post('/carte/add_task', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -607,22 +662,22 @@ app.post('/carte/add_task', (req, res) => {
 
 
     connection.query('INSERT INTO tasks (title, description, project_id_link,duree_theorique,pourcentage_avancemennt,contributeurs,materiels,link_ressources,etat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [title, description, id_project, duree_theorique, pourcentage_avancemennt, contributeurs, materiels, link_ressources,etat], (error, _results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        // recupère les données de la task
-        connection.query('SELECT * FROM tasks WHERE project_id_link = ? AND id_tache = ?', [id_project, _results.insertId], (error, results) => {
+        [title, description, id_project, duree_theorique, pourcentage_avancemennt, contributeurs, materiels, link_ressources, etat], (error, _results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
-            return res.json({ success: true, tasks: results });
+            // recupère les données de la task
+            connection.query('SELECT * FROM tasks WHERE project_id_link = ? AND id_tache = ?', [id_project, _results.insertId], (error, results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, tasks: results });
+            });
         });
-    });
 });
 
 app.post('/carte/get_all_project_tasks', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -636,7 +691,7 @@ app.post('/carte/get_all_project_tasks', (req, res) => {
 });
 
 app.post('/carte/update_task', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -652,15 +707,15 @@ app.post('/carte/update_task', (req, res) => {
 
     connection.query('UPDATE tasks SET title = ?, description = ?, duree_theorique = ?, pourcentage_avancemennt = ?, contributeurs = ?, materiels = ?, link_ressources = ?, etat = ? WHERE id_tache = ?',
         [title, description, duree_theorique, pourcentage_avancemennt, contributeurs, materiels, link_ressources, etat, id], (error, _results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, message: 'Task updated successfully' });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, message: 'Task updated successfully' });
+        });
 });
 
 app.post('/carte/delete_task', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -673,9 +728,24 @@ app.post('/carte/delete_task', (req, res) => {
         return res.json({ success: true, message: 'Task deleted successfully' });
     });
 });
+app.get('/carte/get_all_projects_by_user', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    connection.query(`SELECT projects_key_link.project_id_link as id, projects.title, projects.description, projects.last_modified
+                    FROM projects_key_link
+                    LEFT JOIN projects ON projects_key_link.project_id_link = projects.id_project 
+                    WHERE projects_key_link.user_id_link = ?`, [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, projects: results });
+    });
+});
 
 app.get('/get_all_collaborators_of_one_user', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -684,14 +754,14 @@ app.get('/get_all_collaborators_of_one_user', (req, res) => {
                     LEFT JOIN users ON (users_link.user2 = users.user_id AND users_link.user1 = ?) OR (users_link.user1 = users.user_id AND users_link.user2 = ?)
                     WHERE users.user_id != ?`
         , [data.userID, data.userID, data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, collaborators: results });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, collaborators: results });
+        });
 });
 app.post('/recherche_collaborators', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -701,14 +771,14 @@ app.post('/recherche_collaborators', (req, res) => {
                     LEFT JOIN users ON (users_link.user2 = users.user_id AND users_link.user1 = ?) OR (users_link.user1 = users.user_id AND users_link.user2 = ?)
                     WHERE users.user_name LIKE ? AND users.user_id != ?`
         , [data.userID, data.userID, '%' + search + '%', data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, collaborators: results });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, collaborators: results });
+        });
 });
 app.post('/recher_user', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
@@ -717,52 +787,122 @@ app.post('/recher_user', (req, res) => {
                     FROM users
                     WHERE user_name LIKE ? AND user_id != ?`
         , ['%' + search + '%', data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        return res.json({ success: true, users: results });
-    });
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, users: results });
+        });
 });
+
 app.post('/add_collaborator', (req, res) => {
-    let data = verificationAll(req,res);
+    let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
     const id_user = req.body.collaborator;
 
     // Vérifier si le collaborateur existe déjà
-    connection.query('SELECT * FROM users_link WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)', 
+    connection.query('SELECT * FROM users_link WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)',
         [data.userID, id_user, id_user, data.userID], (error, results) => {
-        if (error) {
-            return res.json({ success: false, message: error.message });
-        }
-        if (results.length > 0) {
-            return res.json({ success: false, message: 'Collaborator already exists' });
-        }
-
-        // Ajouter le collaborateur s'il n'existe pas déjà
-        connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
-            return res.json({ success: true, message: 'Collaborator added successfully' });
+            if (results.length > 0) {
+                return res.json({ success: false, message: 'Collaborator already exists' });
+            }
+
+            // Ajouter le collaborateur s'il n'existe pas déjà
+            connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Collaborator added successfully' });
+            });
+        });
+});
+
+app.post('/request_add_collaborator', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_user = req.body.collaborator;
+
+    // Vérifier si le collaborateur existe déjà
+    connection.query('SELECT * FROM request_link_user WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)',
+        [data.userID, id_user, id_user, data.userID], (error, results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            if (results.length > 0) {
+                return res.json({ success: false, message: 'Request already sent' });
+            }
+
+            // Ajouter le collaborateur s'il n'existe pas déjà
+            connection.query('INSERT INTO request_link_user (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Request sent successfully' });
+            });
+        });
+});
+
+app.get('/have_request_collaborator', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    connection.query(`SELECT users.user_id as id, users.user_name as name, users.email as email ,request_link_user.id as id_request 
+                    FROM request_link_user 
+                    LEFT JOIN users ON request_link_user.user1 = users.user_id
+                    WHERE request_link_user.user2 = ?`, [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, requests: results });
+    }
+    );
+});
+
+app.post('/accept_request_collaborator', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_request = req.body.id_request;
+
+    connection.query('SELECT * FROM request_link_user WHERE id = ?', [id_request], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        const id_user = results[0].user1;
+        connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [id_user, data.userID], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            connection.query('DELETE FROM request_link_user WHERE id = ?', [id_request], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Request accepted successfully' });
+            });
         });
     });
 });
-
 
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 // });
 
 
-function addKeyLinkToBase(user_id, key,iv,auth, id_doc) {
+function addKeyLinkToBase(user_id, key, iv, auth, id_doc) {
     connection.query('INSERT INTO key_link (user_id_link,document_id_link, encryptedData, iv, authTag) VALUES (?, ?, ?, ?, ?)',
-        [user_id,id_doc, key, iv, auth], (error, _results) => {
-        if (error) {
-            throw error;
-        }
-    });
+        [user_id, id_doc, key, iv, auth], (error, _results) => {
+            if (error) {
+                throw error;
+            }
+        });
 }
 
 
@@ -926,7 +1066,7 @@ function decryptDocument(encryptedDocKey, userSecondaryKey, encryptedData) {
     // console.log("encryptedDocKey:", encryptedDocKey);
     // console.log("userSecondaryKey:", userSecondaryKey);
     // console.log("encryptedData:", encryptedData);
-    
+
     if (!encryptedDocKey.iv || !encryptedDocKey.authTag || !encryptedDocKey.encryptedData) {
         throw new Error("Invalid encryptedDocKey format");
     }
@@ -1026,7 +1166,7 @@ wss.on('connection', (ws) => {
         console.log(clents_status);
 
         // afficher tout les clents_status qui ont parsedMessage.message = "43"
-        
+
 
 
 

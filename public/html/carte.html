@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>Carte mentale</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/new_main.css">
+    <link rel="stylesheet" href="css/new_header.css">
     <link rel="stylesheet" href="css/carte.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +15,61 @@
 </head>
 
 <body>
+    <header>
+        <div class="div_param_acc_tel">
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+            <div class="ligne"></div>
+        </div>
+        <div class="div_center_header">
+            <img src="/logo/logo_N.png" alt="logo">
+            <h1>
+                NeosMentis
+            </h1>
+        </div>
+        <div class="div_project_info">
+            <h4 class="prepo">From :</h4>
+            <h3 class="start_time"></h3>
+            <h4 class="prepo">to :</h4>
+            <h3 class="end_time"></h3>
+            <div class="div_espace"></div>
+            <h4 class="prepo">Estimated time :</h4>
+            <h3 class="temps_total"></h3>
+            <div class="div_espace"></div>
+            <h4 class="prepo">Maximal time left :</h4>
+            <h3 class="temps_total_vise"></h3>
+            <div class="div_espace"></div>
+            <h4 class="prepo">Progress :</h4>
+            <h3 class="avancement"></h3>
+        </div>
+        <div class="div_header_r">
+            <div class="div_acces_header">
+                <div class="div_home_bnt">
+                    <a href="/">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M17.0961 8.10703L10.8461 2.21016C10.843 2.20749 10.8402 2.20462 10.8375 2.20156C10.3607 1.76792 9.6323 1.76792 9.15547 2.20156L9.14688 2.21016L2.90391 8.10703C2.64644 8.34378 2.49995 8.67757 2.5 9.02734V16.25C2.5 16.9404 3.05964 17.5 3.75 17.5H7.5C8.19036 17.5 8.75 16.9404 8.75 16.25V12.5H11.25V16.25C11.25 16.9404 11.8096 17.5 12.5 17.5H16.25C16.9404 17.5 17.5 16.9404 17.5 16.25V9.02734C17.5001 8.67757 17.3536 8.34378 17.0961 8.10703ZM16.25 16.25H12.5V12.5C12.5 11.8096 11.9404 11.25 11.25 11.25H8.75C8.05964 11.25 7.5 11.8096 7.5 12.5V16.25H3.75V9.02734L3.75859 9.01953L10 3.125L16.2422 9.01797L16.2508 9.02578L16.25 16.25Z" />
+                        </svg>
+                    </a>
+                    <a href="/project">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" fill="none">
+                            <path
+                                d="M22 8H8C6.93913 8 5.92172 8.42143 5.17157 9.17157C4.42143 9.92172 4 10.9391 4 12V40C4 41.0609 4.42143 42.0783 5.17157 42.8284C5.92172 43.5786 6.93913 44 8 44H36C37.0609 44 38.0783 43.5786 38.8284 42.8284C39.5786 42.0783 40 41.0609 40 40V26M37 5C37.7956 4.20435 38.8748 3.75736 40 3.75736C41.1252 3.75736 42.2044 4.20435 43 5C43.7956 5.79565 44.2426 6.87478 44.2426 8C44.2426 9.12522 43.7956 10.2044 43 11L24 30L16 32L18 24L37 5Z"
+                                stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="div_compte_header">
+                <div class="div_profil_bnt">
+                    <a href="/log?type=log">Login</a>
+                    <a href="/log?type=register">Register</a>
+                </div>
+            </div>
+        </div>
+
+    </header>
     <div class="load_div">
         <div class="loader"></div>
     </div>
@@ -25,47 +81,55 @@
         </div>
         <div class="div_setting_task_parent">
             <div class="div_titre_sett sett">
-                <input type="text" placeholder="Titre" id="titre_tache"></div>
-            </div>
-            <div class="div_description_sett sett">
-                <textarea name="description" id="description_tache" cols="30" rows="10"
-                    placeholder="Description"></textarea>
-            </div>
-            <div class="div_temps_sett sett">
-                <span>Temps : </span>
-                <input type="number" placeholder="J" id="temps_tache_jour" >
-                <span class="petit">j</span>
-                <input type="number" placeholder="H" id="temps_tache_heure">
-                <span class="petit">h</span>
-                <input type="number" placeholder="Min" id="temps_tache_min">
-                <span class="petit">min</span>
-            </div>
-            <div class="div_pourcentage_sett sett">
-                <span>Avancement : </span>
-                <input type="number" placeholder="60" id="pourcentage_tache">
-                <span>%</span>
-            </div>
-            <div class="div_contrib_sett sett">
-                <span class="contributer_sett">Contributeurs :</span>
-                <input type="text" placeholder="Mark Delafoce" id="contributeurs_tache">
-                <div class="div_recherche_resultat">
-                    <div class="div_result">David</div>
-                    <div class="div_result">Claire</div>
-                    <div class="div_result">Maxens</div>
-                </div>
-                <div class="div_list_people">
-                </div>
-            </div>
-            <div class="div_new">
-                <div class="div_acept_event">OK</div>
+                <input type="text" placeholder="Titre" id="titre_tache">
             </div>
         </div>
+        <div class="div_description_sett sett">
+            <textarea name="description" id="description_tache" cols="30" rows="10"
+                placeholder="Description"></textarea>
+        </div>
+        <div class="div_temps_sett sett">
+            <span>Temps : </span>
+            <input type="number" placeholder="J" id="temps_tache_jour">
+            <span class="petit">j</span>
+            <input type="number" placeholder="H" id="temps_tache_heure">
+            <span class="petit">h</span>
+            <input type="number" placeholder="Min" id="temps_tache_min">
+            <span class="petit">min</span>
+        </div>
+        <div class="div_pourcentage_sett sett">
+            <span>Avancement : </span>
+            <input type="number" placeholder="60" id="pourcentage_tache">
+            <span>%</span>
+        </div>
+        <div class="div_contrib_sett sett">
+            <span class="contributer_sett">Contributeurs :</span>
+            <input type="text" placeholder="Mark Delafoce" id="contributeurs_tache">
+            <div class="div_recherche_resultat">
+            </div>
+            <div class="div_list_people">
+            </div>
+        </div>
+        <div class="div_new">
+            <div class="div_acept_event">OK</div>
+        </div>
+    </div>
     </div>
 </body>
+<!-- <script src="js/collaborator.js"></script> -->
+<script src="js/user_set.js"></script>
 <script>
     const workspace = document.querySelector(".workspace");
     const div_menu = document.querySelector(".div_menu");
+    let url_param = new URLSearchParams(window.location.search);
+    let id_project = url_param.get('project');
+    let transit_collaborator = {};
     let temps_vise = 13.5;
+    let max_all_time = 0;
+    let avancement = 0;
+    let max_path = [];
+    let time_left = 0;
+    let date_start;
 
     const endpointOptions_in = {
         isSource: true,
@@ -73,7 +137,7 @@
         maxConnections: -1,
         endpoint: ["Dot", { radius: 5 }],
         paintStyle: { fill: "var(--transparent)" },
-        connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
+        connectorStyle: { stroke: "var(--blue-dark)", strokeWidth: 2 },
         connector: ["Bezier", { curviness: 50 }],
         cssClass: "endpoint-in",
         overlays: [
@@ -81,7 +145,7 @@
                 location: 1,
                 width: 10,
                 length: 10,
-                paintStyle: { fill: "var(--bleu)" },
+                paintStyle: { fill: "var(--blue-dark)" },
                 foldback: 0.8,
                 detachable: true
             }]
@@ -108,9 +172,15 @@
     };
 
     jsPlumb.ready(function () {
+        console.log(id_project);
+        if (id_project == null) {
+            console.error('No project selected');
+            return;
+        }
+
         (async function () {
             await get_project_settings();
-            await get_all_project_tasks(1);
+            await get_all_project_tasks(id_project);
         })();
         jsPlumb.setContainer(workspace);
 
@@ -139,7 +209,7 @@
                 //         conn.setParameter("info", newInfo);
                 //     }
                 // });
-                get_all_time();
+                // get_all_time();
             });
 
             jsPlumb.bind("connectionDetached", function (info) {
@@ -152,7 +222,7 @@
                 jsPlumb.deleteConnection(connection);
                 jsPlumb.repaintEverything();
 
-                get_all_time();
+                // get_all_time();
             });
 
 
@@ -165,8 +235,8 @@
                     jsPlumb.connect({
                         source: endpointsOnFsdhg.get(1),
                         target: endpointsOnFsd.get(0),
-                        paintStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
-                        connectorStyle: { stroke: "var(--bleu)", strokeWidth: 2 },
+                        paintStyle: { stroke: "var(--blue)", strokeWidth: 2 },
+                        connectorStyle: { stroke: "var(--blue)", strokeWidth: 2 },
                         connector: ["Bezier", { curviness: 50 }],
                         cssClass: "connection1",
                         detachable: true,
@@ -175,9 +245,9 @@
             }
             get_all_time();
 
-            
+
             document.querySelector('.load_div').style.display = 'none';
-        }, 1000);
+        }, 500);
 
 
 
@@ -197,13 +267,14 @@
         let titre = selected.querySelector('h2').textContent;
         let description = selected.querySelector('p').textContent;
 
-        let jour = Math.floor(time/24);
-        let heure = Math.floor(time%24);
+        let jour = Math.floor(time / 24);
+        let heure = Math.floor(time % 24);
         let min = Math.round((time % 1) * 60);
 
         let contributeurs = selected.querySelector('.div_list_people').children;
 
-        
+        let transit_collaborator = {};
+
         div_menu.style.display = 'flex';
         div_menu.querySelector('#titre_tache').value = titre;
         div_menu.querySelector('#titre_tache').focus();
@@ -216,7 +287,7 @@
 
         div_menu.setAttribute('data-selected', selected.id);
     }
-    
+
     function closed_menu() {
         document.querySelectorAll('.selected').forEach(bloc => {
             bloc.classList.remove('selected');
@@ -232,7 +303,48 @@
         div_menu.classList.remove('selected');
         div_menu.setAttribute('data-selected', "");
     }
-    
+
+    document.querySelector('#contributeurs_tache').addEventListener('input', async function () {
+        let value = this.value;
+        let div_recherche_resultat = document.querySelector('.div_recherche_resultat');
+
+        div_recherche_resultat.innerHTML = '';
+        if (value.length > 0) {
+            await get_collaborator_recherche(value).then(data => {
+                data.collaborators.forEach(collaborator => {
+                    let div_result = document.createElement('div');
+                    div_result.setAttribute("data-clicked", "false");
+                    div_result.className = 'div_result';
+                    div_result.textContent = collaborator.name.slice(0, 2);
+                    div_recherche_resultat.appendChild(div_result);
+
+                    div_result.addEventListener("click", async function () {
+
+                        if (div_result.getAttribute("data-clicked") == "false") {
+                            div_result.innerHTML = "";
+                            let div_plus = document.createElement("div");
+                            div_plus.className = "div_plus";
+                            div_plus.innerHTML = "+";
+                            div_result.appendChild(div_plus);
+                            div_plus.style.opacity = "1";
+
+                            div_result.setAttribute("data-clicked", "true");
+                        } else {
+                            div_result.innerHTML = collaborator.name.slice(0, 2);
+                            div_result.setAttribute("data-clicked", "false");
+                            transit_collaborator[collaborator.id] = collaborator.name;
+                            div_result.setAttribute("selcted", "true");
+                            document.querySelector('#contributeurs_tache').value = '';
+                            document.querySelector('#contributeurs_tache').dispatchEvent(new Event('input'));
+                        }
+                    });
+                });
+            });
+        }else{
+            div_recherche_resultat.innerHTML = '';
+        }
+    });
+
     div_menu.querySelector(".div_acept_event").addEventListener('click', function () {
         let titre = div_menu.querySelector('#titre_tache').value;
         let description = div_menu.querySelector('#description_tache').value;
@@ -246,25 +358,25 @@
         let selected = document.getElementById(div_menu.getAttribute('data-selected'));
         selected.querySelector('h2').textContent = titre;
         selected.querySelector('p').textContent = description;
-        selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60);
-        selected.setAttribute('data-time', parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60);
+        selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour) * 24 + parseFloat(heure) + parseFloat(min) / 60);
+        selected.setAttribute('data-time', parseFloat(jour) * 24 + parseFloat(heure) + parseFloat(min) / 60);
         selected.setAttribute('data-progress', pourcentage);
-
+        console.log(transit_collaborator);
         let etat = '';
         if (pourcentage > 0 && pourcentage < 100) {
-            selected.querySelector('.div_etat').textContent = 'En cours';
-            etat = 'En cours';
+            selected.querySelector('.div_etat').textContent = 'In progress';
+            etat = 'In progress';
         } else if (pourcentage == 100) {
-            selected.querySelector('.div_etat').textContent = 'Terminé';
-            etat = 'Terminé';
+            selected.querySelector('.div_etat').textContent = 'Done';
+            etat = 'Done';
         } else {
-            selected.querySelector('.div_etat').textContent = 'En attente';
-            etat = 'En attente';
+            selected.querySelector('.div_etat').textContent = 'Wainting';
+            etat = 'Waiting';
         }
 
         // selected.querySelector('.div_etat').textContent = 'En cours';
         // selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour) + parseFloat(heure) / 24 + parseFloat(min) / 1440);
-        update_task(selected.id,titre,parseFloat(jour)*24 + parseFloat(heure) + parseFloat(min)/60,pourcentage,etat,description,'{}',link_ressources,'{}');
+        update_task(selected.id, titre, parseFloat(jour) * 24 + parseFloat(heure) + parseFloat(min) / 60, pourcentage, etat, description, '{}', link_ressources, '{}');
         get_all_time();
     });
 
@@ -282,7 +394,7 @@
                 if (connection.sourceId === selected.id || connection.targetId === selected.id) {
                     try {
                         jsPlumb.deleteConnection(connection);
-                    } 
+                    }
                     catch (error) {
                     }
                 }
@@ -302,10 +414,11 @@
         const minutes = Math.round((float_hour % 1) * 60);
         return (hours) + 'h' + (minutes < 10 ? '0' + minutes : minutes);
     }
-    function create_tache(id, titre, temps, pourcentage, etat, description, contributeur,event=null) {
+
+    function create_tache(id, titre, temps, pourcentage, etat, description, contributeur, event = null) {
         // Créer les éléments HTML
         const newBloc = document.createElement('div');
-        const divGestion = document.createElement('div');   
+        const divGestion = document.createElement('div');
         const divEtat = document.createElement('div');
         const divTemps = document.createElement('div');
         const h2Titre = document.createElement('h2');
@@ -360,6 +473,15 @@
         divTemps.className = 'div_temps_tache';
         divListPeople.className = 'div_list_people';
 
+        if (etat == "Done"){
+            newBloc.classList.add('done');
+        }else if(etat == "In progress"){
+            newBloc.classList.add('in_progress');
+        }else{
+            newBloc.classList.add('waiting');
+        }
+
+
         // Définir le contenu
         divEtat.textContent = etat;
         divTemps.textContent = convert_float_to_hours(temps);
@@ -408,7 +530,7 @@
                     y: parseFloat(newBloc.style.top),
                     closed: true
                 };
-                
+
 
             } else {
                 newBloc.style.height = '';
@@ -422,7 +544,7 @@
                 divBtnClose.style.borderRadius = '5px 5px 0 0';
 
                 // remettre les point d'accroche à leur place
-    
+
                 jsPlumb.repaintEverything();
                 actual_localStorage[newBloc.id].position = {
                     x: parseFloat(newBloc.style.left),
@@ -488,7 +610,7 @@
         } else if (time >= temps_vise * 0.9) {
             divTimeLeft.style.backgroundColor = 'var(--orange-ok)';
         } else {
-            divTimeLeft.style.backgroundColor = 'var(--vert-ok)';
+            divTimeLeft.style.backgroundColor = 'var(--blue)';
         }
         divTimeLeft.setAttribute('data-liste-path', JSON.stringify(liste_path));
         parent.appendChild(divTimeLeft);
@@ -497,7 +619,8 @@
             let noeud = document.querySelectorAll('.bloc');
             noeud.forEach(n => {
                 if (liste_path.includes(n.id)) {
-                    n.style.backgroundColor = 'var(--bleu)';
+                    n.style.animation = 'none';
+                    n.style.backgroundColor = 'var(--blue)';
                 } else {
                     n.style.backgroundColor = '';
                 }
@@ -508,6 +631,7 @@
             let noeud = document.querySelectorAll('.bloc');
             noeud.forEach(n => {
                 n.style.backgroundColor = '';
+                n.style.animation = '';
             });
         });
     }
@@ -553,7 +677,9 @@
         }
         path.slice(1).forEach(node => {
             let time = parseFloat(document.getElementById(node).getAttribute('data-time'));
-            total_time += time;
+            // let pourcent  = (100-parseFloat(document.getElementById(node).getAttribute('data-progress')))/100;
+            let pourcent = 1;
+            total_time += time*pourcent;
         });
         return total_time;
     }
@@ -566,6 +692,43 @@
         document.querySelectorAll('.bloc').forEach(bloc => {
             const blocId = bloc.id;
             const blocConnections = jsPlumb.getConnections({ target: blocId });
+
+            let conn = jsPlumb.getConnections({ target: blocId });
+            let all_100 = true;
+            if (conn.length > 0) {
+                conn.forEach(con => {
+                    let pourcentage = parseFloat(document.getElementById(con.sourceId).getAttribute('data-progress'));
+                    if (pourcentage != 100) {
+                        all_100 = false;
+                    }
+                });
+            }
+
+            if (bloc.getAttribute('data-progress') == 100) {
+                bloc.classList.add('done');
+                bloc.classList.remove('in_progress');
+                bloc.classList.remove('waiting');
+            }else if (bloc.getAttribute('data-progress') > 0) {
+                bloc.classList.add('in_progress');
+                bloc.classList.remove('done');
+                bloc.classList.remove('waiting');
+            }else{
+                bloc.classList.add('waiting');
+                bloc.classList.remove('done');
+                bloc.classList.remove('in_progress');
+            }
+
+            if (bloc.getAttribute('data-progress') == 0 && all_100) {
+                console.log(bloc,all_100);
+                bloc.classList.add('have_to_start');
+                bloc.classList.remove('done');
+                bloc.classList.remove('in_progress');
+                bloc.classList.remove('waiting');
+            }else{
+                bloc.classList.remove('have_to_start');
+            }
+
+
             if (blocConnections.length === 0) {
                 json_layer = {
                     ...json_layer,
@@ -616,6 +779,9 @@
                 });
             }
         });
+
+        max_all_time = 0;
+        max_path = [];
         // console.log(json_layer);
         Object.keys(json_layer).forEach(layer => {
             json_layer[layer].forEach(elem => {
@@ -632,10 +798,19 @@
                     });
                     document.getElementById(elem.source).setAttribute('data-time-start', max_time);
                     add_time_left(document.getElementById(elem.source), max_time, finale_path);
+
+                    let time = max_time + parseFloat(document.getElementById(elem.source).getAttribute('data-time'));
+
+                    if (finale_path && max_path.length < finale_path.length) {
+                        max_path = finale_path;
+                    }
+
+                    if (time > max_all_time) {
+                        max_all_time = time;
+                    }
                 }
             });
         });
-
 
         // supprimer les .div_pourcentage 
         document.querySelectorAll('.div_pourcentage').forEach(div => {
@@ -649,38 +824,95 @@
 
         // enumerate all the connections, and add overlays to them.
         jsPlumb.getAllConnections().forEach(function (conn) {
-                                
-                conn.addOverlay(["Arrow", { location: 1, width: 10, length: 10 }]);
 
-                // Add an overlay to the connection
-                let elem = document.getElementById(conn.sourceId);
+            conn.addOverlay(["Arrow", { location: 1, width: 10, length: 10 }]);
 
-                if (!elem.getAttribute('data-progress')) {
-                    elem.setAttribute('data-progress', 100);
-                }
-                let progress = (elem.getAttribute('data-progress'));
-                let random_id = Math.random().toString(36).substring(7);
-                // verify if the id is already used
-                while (document.getElementById(random_id)) {
-                    random_id = Math.random().toString(36).substring(7);
-                }
+            // Add an overlay to the connection
+            let elem = document.getElementById(conn.sourceId);
 
-                conn.addOverlay(["Label", {
-                    label: progress,
-                    cssClass: "aLabel " + random_id
-                }]);
-                let div_pourcentage = document.createElement('div');
-                div_pourcentage.className = 'div_pourcentage';
-                div_pourcentage.style.width = progress + '%';
+            if (!elem.getAttribute('data-progress')) {
+                elem.setAttribute('data-progress', 100);
+            }
+            let progress = (elem.getAttribute('data-progress'));
+            let random_id = Math.random().toString(36).substring(7);
+            // verify if the id is already used
+            while (document.getElementById(random_id)) {
+                random_id = Math.random().toString(36).substring(7);
+            }
 
-                if (progress == 100) {
-                    div_pourcentage.style.backgroundColor = 'var(--vert-ok)';
-                }
+            conn.addOverlay(["Label", {
+                label: progress,
+                cssClass: "aLabel " + random_id
+            }]);
+            let div_pourcentage = document.createElement('div');
+            div_pourcentage.className = 'div_pourcentage';
+            div_pourcentage.style.width = progress + '%';
+
+            if (progress == 100) {
+                div_pourcentage.style.backgroundColor = 'var(--vert-ok)';
+            }
 
 
-                document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
-            });
+            document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
+        });
         jsPlumb.repaintEverything();
+        update_header();
+    }
+
+    function update_header(){
+        time_left = 0;
+        max_path.forEach(path => {
+            let elem = document.getElementById(path);
+            if (elem){
+                let time = parseFloat(elem.getAttribute('data-time'));
+                let pourcent  = (100-parseFloat(elem.getAttribute('data-progress')))/100;
+                time_left += time*pourcent;
+            }
+        });
+
+        console.log('time_left:', time_left);
+        
+        console.log('max_all_time:', max_all_time);
+
+        avancement = (max_all_time - time_left);
+
+        console.log('avancement:', avancement);
+
+        let diff=0;
+        if (date_start != null){
+            let time = new Date().getTime() - date_start.getTime();
+            // convert en heure
+            diff = time / 3600000;
+        } 
+
+        let div_temps_total = document.querySelector('.temps_total');
+        div_temps_total.textContent = convert_float_to_hours(time_left);
+        div_temps_total.style.color = time_left > temps_vise-diff ? 'var(--rouge-ok)' : 'var(--vert-ok)';
+
+        let temps_viser = document.querySelector('.temps_total_vise');
+        temps_viser.textContent = convert_float_to_hours(temps_vise-diff);
+        temps_viser.style.color = time_left > temps_vise-diff ? 'var(--rouge-ok)' : 'var(--text-color)';
+
+        let temps_avancer = document.querySelector('.avancement');
+        temps_avancer.textContent = convert_float_to_hours(avancement);
+
+        let start_time = document.querySelector('.start_time');
+        if (date_start != null){
+            start_time.textContent = date_start.toLocaleDateString() + ' ' + date_start.toLocaleTimeString();
+        }else{
+            start_time.textContent = 'Maintenant';
+        }
+
+        let end_time = document.querySelector('.end_time');
+        if (date_start != null){
+            let end = new Date(date_start.getTime() + (max_all_time) * 3600000);
+            end_time.textContent = end.toLocaleDateString() + ' ' + end.toLocaleTimeString();
+        }else{
+            let now = new Date();
+            let end = new Date(now.getTime() + (time_left) * 3600000);
+            end_time.textContent = end.toLocaleDateString() + ' ' + end.toLocaleTimeString();
+        }
+        
     }
 
     async function save_project_settings(auto = true) {
@@ -732,18 +964,21 @@
             let settings_bloc = data.data.settings_bloc;
             localStorage.setItem('connections', settings_connection);
             localStorage.setItem('blocs', settings_bloc);
+            if (data.data.date_start != null){
+                date_start = new Date(data.data.date_start);
+            }
         } else {
             console.error('Error retrieving settings:', data.message);
         }
     }
 
-    async function add_task(title, duree_theorique, pourcentage_avancemennt, materiels, description, contributeurs,id_project,link_ressources,e) {
-        if (pourcentage_avancemennt> 0 && pourcentage_avancemennt < 100) {
-            etat = 'En cours';
+    async function add_task(title, duree_theorique, pourcentage_avancemennt, materiels, description, contributeurs, id_project, link_ressources, e) {
+        if (pourcentage_avancemennt > 0 && pourcentage_avancemennt < 100) {
+            etat = 'In progress';
         } else if (pourcentage_avancemennt == 100) {
-            etat = 'Terminé';
+            etat = 'Done';
         } else {
-            etat = 'En attente';
+            etat = 'Waiting';
         }
         const response = await fetch('/carte/add_task', {
             method: 'POST',
@@ -766,14 +1001,14 @@
         if (data.success) {
             data.tasks.forEach(task => {
                 console.log(task);
-                let newB = create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs,e);
+                let newB = create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs, e);
                 open_menu(newB);
             });
             console.log('Task added successfully');
         } else {
             console.error('Error adding task:', data.message);
         }
-        
+
     }
 
     async function get_all_project_tasks(id_project) {
@@ -796,10 +1031,10 @@
         } else {
             console.error('Error adding task:', data.message);
         }
-        
+
     }
-    
-    async function update_task(id,titre,temps,pourcentage,etat,description,contributeurs,link_ressources,materiels) {
+
+    async function update_task(id, titre, temps, pourcentage, etat, description, contributeurs, link_ressources, materiels) {
         const response = await fetch('/carte/update_task', {
             method: 'POST',
             headers: {
@@ -823,19 +1058,20 @@
         } else {
             console.error('Error updating task:', data.message);
         }
-        
+
     }
 
+
     document.addEventListener('mousedown', function (e) {
-        
+
         if (e.ctrlKey && e.altKey) {
             let url_param = new URLSearchParams(window.location.search);
             let id = url_param.get('project');
             if (id) {
                 // create_tache("t8", '7', 10, 31, 'En cours', 'Acheter du pain pour nourir les oiseaux', "{}",e);
-                add_task('', 0, 0, '{}', '', '{}',id,'{}',e);
+                add_task('', 0, 0, '{}', '', '{}', id, '{}', e);
             }
-        }else if (!e.target.closest('.div_menu')) {
+        } else if (!e.target.closest('.div_menu')) {
             closed_menu();
         }
     });

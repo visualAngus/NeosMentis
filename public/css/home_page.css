@@ -487,3 +487,47 @@ main{
     transition: all var(--transition);
 
 }
+.switch_collaborator_request{
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.collaborator_bnt, .requests_bnt {
+    width: 45%;
+    height: 100%;
+
+    padding: 5px 10px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+
+    background-color: var(--text-color);
+
+    color: var(--noir);
+    opacity: 0.5;
+
+    user-select: none;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    border-radius: 10px;
+
+    transition: all var(--transition);
+}
+.collaborator_bnt:hover, .requests_bnt:hover{
+    opacity: 0.8;
+}
+.collaborator_bnt.active_menu, .requests_bnt.active_menu{
+    opacity: 1;
+}
