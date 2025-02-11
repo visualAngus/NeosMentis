@@ -118,8 +118,8 @@
 </body>
 <!-- <script src="js/collaborator.js"></script> -->
 <script src="js/user_set.js"></script>
+<script src="js/movement.js"></script>
 <script>
-    const workspace = document.querySelector(".workspace");
     const div_menu = document.querySelector(".div_menu");
     let url_param = new URLSearchParams(window.location.search);
     let id_project = url_param.get('project');
@@ -130,6 +130,7 @@
     let max_path = [];
     let time_left = 0;
     let date_start;
+
 
     const endpointOptions_in = {
         isSource: true,
@@ -172,7 +173,6 @@
     };
 
     jsPlumb.ready(function () {
-        console.log(id_project);
         if (id_project == null) {
             console.error('No project selected');
             return;
@@ -183,6 +183,9 @@
             await get_all_project_tasks(id_project);
         })();
         jsPlumb.setContainer(workspace);
+        jsPlumb.draggable(workspace.querySelectorAll('.draggable-element'), {
+            containment: 'parent'
+        });
 
         setTimeout(() => {
             jsPlumb.bind("connection", function (info) {
@@ -361,7 +364,6 @@
         selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(parseFloat(jour) * 24 + parseFloat(heure) + parseFloat(min) / 60);
         selected.setAttribute('data-time', parseFloat(jour) * 24 + parseFloat(heure) + parseFloat(min) / 60);
         selected.setAttribute('data-progress', pourcentage);
-        console.log(transit_collaborator);
         let etat = '';
         if (pourcentage > 0 && pourcentage < 100) {
             selected.querySelector('.div_etat').textContent = 'In progress';
@@ -426,7 +428,6 @@
         const divListPeople = document.createElement('div');
         const divBtnClose = document.createElement('div');
         // Définir les classes et IDs
-        console.log(id);
         newBloc.id = id;
         let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
         if (actual_localStorage[id]) {
@@ -559,12 +560,12 @@
 
         // Ajouter au document et configurer jsPlumb
         workspace.appendChild(newBloc);
-        console.log(newBloc.id);
         jsPlumb.addEndpoint(newBloc.id, { anchors: "LeftMiddle" }, endpointOptions_out);
         jsPlumb.addEndpoint(newBloc.id, { anchors: "RightMiddle" }, endpointOptions_in);
 
         jsPlumb.draggable(newBloc.id, {
             drag: function (event) {
+                jsPlumb.setZoom(scale);
             },
             stop: function (event) {
 
@@ -719,7 +720,6 @@
             }
 
             if (bloc.getAttribute('data-progress') == 0 && all_100) {
-                console.log(bloc,all_100);
                 bloc.classList.add('have_to_start');
                 bloc.classList.remove('done');
                 bloc.classList.remove('in_progress');
@@ -870,13 +870,7 @@
             }
         });
 
-        console.log('time_left:', time_left);
-        
-        console.log('max_all_time:', max_all_time);
-
         avancement = (max_all_time - time_left);
-
-        console.log('avancement:', avancement);
 
         let diff=0;
         if (date_start != null){
@@ -927,9 +921,6 @@
             return;
         }
 
-        console.log('connections:', connections);
-        console.log('blocs:', blocs);
-
         const response = await fetch('/carte/save_carte_settings', {
             method: 'POST',
             headers: {
@@ -941,7 +932,6 @@
             })
         });
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             console.log('Settings saved successfully');
         } else {
@@ -958,7 +948,6 @@
             }
         });
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             let settings_connection = data.data.settings_connection;
             let settings_bloc = data.data.settings_bloc;
@@ -1000,7 +989,6 @@
         const data = await response.json();
         if (data.success) {
             data.tasks.forEach(task => {
-                console.log(task);
                 let newB = create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs, e);
                 open_menu(newB);
             });
@@ -1022,10 +1010,8 @@
             })
         });
         const data = await response.json();
-        console.log(data);
         if (data.success) {
             data.tasks.forEach(task => {
-                console.log(task);
                 create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs);
             });
         } else {

@@ -1,6 +1,7 @@
 
 body{
     overflow: hidden;
+    position: relative;
 }
 
 .div_menu{
@@ -653,4 +654,21 @@ input[type="number"] {
 }
 .div_center_header{
     display: none;
+}
+
+.workspace {
+    width: 1000vw;
+    height: 1000vh;
+    top: 0;
+    left: 0;
+    position: absolute;
+    cursor: grab; /* Change le curseur pour indiquer que l'élément est déplaçable */
+    transform: translate(0, 0) scale(1); /* Initialise la transformation et le zoom */
+    transition: transform 0.1s ease-out; /* Pour un effet de transition fluide */
+    transform-origin: center center; /* Centre de la transformation */
+
+    border: 1px solid var(--gray-light);
+    border-radius: 20px;
+
+    z-index: 99 !important;
 }
