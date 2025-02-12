@@ -761,6 +761,7 @@ async function save_doc(outputData) {
         })
         .catch(error => console.error('Error:', error));
 }
+
 document.getElementById('shareButton').addEventListener('click', () => {
     let id = 3;
     fetch('/partage_document', {

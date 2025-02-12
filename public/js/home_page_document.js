@@ -110,7 +110,7 @@ async function create_document_base() {
         });
         const data = await response.json();
         if (data.success) {
-            window.location.href = `/editor2?id=${data.id}`;
+            window.location.href = `/editor?id=${data.id}`;
         } else {
             console.error('Error creating document:', data.message);
         }
@@ -183,7 +183,7 @@ function add_document(parent, title, id, add_div,date) {
     new_time = getTimeBetween(date);
     div.innerHTML = `<h2>${title}</h2> <p>${new_time}</p>`;
     div.addEventListener('click', () => {
-        window.location.href = `/editor2?id=${id}`;
+        window.location.href = `/editor?id=${id}`;
     });       
 
     parent.appendChild(div);

@@ -22,20 +22,45 @@ async function get_all_user_info() {
         let date = new Date();
         let hour = date.getHours(); 
         console.log(hour);
+        const morningMessages = [
+            `Good morning, sunshine ${data.data.username} ! `, 
+            `Wakey, wakey, ${data.data.username} ! `, 
+            `Top of the morning to you, ${data.data.username} ! `,
+            `Rise and shine, ${data.data.username} ! `,
+            `Morning glory, ${data.data.username} ! `
+        ];
+        const helloMessages = [
+            `Hey there ${data.data.username} ! `, 
+            `Howdy, ${data.data.username} ! `, 
+            `What's up, ${data.data.username} ! `,
+            `Hi there, ${data.data.username} ! `,
+        ];
+        const afternoonMessages = [
+            `Good afternoon, champ ${data.data.username} ! `, 
+            `Hope you're crushing it, ${data.data.username} ! `, 
+            `Afternoon delight, ${data.data.username} ! `,
+            `Having a good day, ${data.data.username} ? `,
+            `Keep up the great work, ${data.data.username} ! `
+        ];
+        const eveningMessages = [
+            `Good evening, night owl ${data.data.username} ! `, 
+            `Evening, superstar ${data.data.username} ! `, 
+            `Hope you had a blast today, ${data.data.username} ! `,
+            `Sweet evening, ${data.data.username} ! `
+        ];
+
+        let message;
         if (hour < 10) {
-            var message = "Good morning, ";
-        }
-        else if (hour < 15) {
-            var message = "hello, ";
-        }
-        else if (hour < 18) {
-            var message = "Good afternoon, ";
-        }
-        else {
-            var message = "Good evening, ";
+            message = morningMessages[Math.floor(Math.random() * morningMessages.length)];
+        } else if (hour < 15) {
+            message = helloMessages[Math.floor(Math.random() * helloMessages.length)];
+        } else if (hour < 18) {
+            message = afternoonMessages[Math.floor(Math.random() * afternoonMessages.length)];
+        } else {
+            message = eveningMessages[Math.floor(Math.random() * eveningMessages.length)];
         }
 
-        document.querySelector('.div_titre_welcome').children[0].innerHTML = message + data.data.username;
+        document.querySelector('.div_titre_welcome').children[0].innerHTML = message;
 
         h2.addEventListener('click', () => {
             // open_profile_menu(h2);
@@ -51,25 +76,106 @@ async function get_all_user_info() {
 
 
         let events = data.events;
+        let today = new Date();
+        let séparator = 0;
+        console.log("events.length:",events.length);
+        if (events.length >10) {
+            events = events.slice(0,10);
+            events.push({title: "See more"});
+        }
+        let nb_events = 0;
+        let is_for_tomorrow = 0;
+
+        if (events.length == 0) {
+            let div = document.createElement('div');
+            div.classList.add('nothing_div');
+            div.innerHTML = `<h3>Nothing planned for today</h3>`;
+            document.querySelector('.div_events').appendChild(div);
+
+            div = document.createElement('div');
+            div.classList.add('div_separator');
+            div.classList.add('tomorrow');
+            document.querySelector('.div_events').appendChild(div);
+
+            div = document.createElement('div');
+            div.classList.add('nothing_div');
+            div.innerHTML = `<h3>Nothing planned for tomorrow</h3>`;
+            document.querySelector('.div_events').appendChild(div);
+
+            div = document.createElement('div');
+            div.classList.add('div_separator');
+            div.classList.add('tomorrow');
+            document.querySelector('.div_events').appendChild(div);
+        }
+
         events.forEach(event => {
-            console.log(event);
+            console.log("event:",event);
             let start = convert_date_into_day_name(event.startTime);
             let end = convert_date_into_day_name(event.endTime);
 
-            let ev = createEventDiv(event.title, start, event.startTime.split("T")[1].split(":").slice(0,2).join(":"), end, event.endTime.split("T")[1].split(":").slice(0,2).join(":"),event.startTime,event.color, event.id);
-            document.querySelector('.div_events').appendChild(ev);
+            let date_start = new Date(event.startTime);
+
+            if (date_start.getDate() != today.getDate() && nb_events == 0) {
+                let div = document.createElement('div');
+                div.classList.add('nothing_div');
+                div.innerHTML = `<h3>Nothing planned for today</h3>`;
+                document.querySelector('.div_events').appendChild(div);
+            }
+
+            // si date_start est demain
+            if (date_start.getDate() == today.getDate() + 1) {
+                if (séparator == 0) {
+                    let div = document.createElement('div');
+                    div.classList.add('div_separator');
+                    div.classList.add('tomorrow');
+                    document.querySelector('.div_events').appendChild(div);
+                }
+                séparator = 1;
+                is_for_tomorrow = 1;
+            }else if (date_start.getDate() != today.getDate() && date_start.getDate() != today.getDate() + 1) {
+                if (is_for_tomorrow == 0){
+                    let div = document.createElement('div');
+                    div.classList.add('div_separator');
+                    div.classList.add('tomorrow');
+                    document.querySelector('.div_events').appendChild(div);
+
+                    div = document.createElement('div');
+                    div.classList.add('nothing_div');
+                    div.innerHTML = `<h3>Nothing planned for tomorrow</h3>`;
+                    document.querySelector('.div_events').appendChild(div);
+                    is_for_tomorrow = 1;
+                }
+                if (séparator == 0 || séparator == 1) {
+                    let div = document.createElement('div');
+                    div.classList.add('div_separator');
+                    div.classList.add('later');
+                    document.querySelector('.div_events').appendChild(div);
+                }
+                séparator = 2;
+            }            
+            if (event.title == "See more") {
+                let div = document.createElement('div');
+                div.classList.add('div_see_more');
+                div.innerHTML = `<h3>See more</h3>`;
+                div.addEventListener('click', () => {
+                    window.location.href = '/agenda';
+                });
+                document.querySelector('.div_events').appendChild(div);
+            } else {
+                let ev = createEventDiv(event.title, start, event.startTime.split("T")[1].split(":").slice(0,2).join(":"), end, event.endTime.split("T")[1].split(":").slice(0,2).join(":"),event.startTime,event.color, event.id);
+                document.querySelector('.div_events').appendChild(ev);
+            }
+            nb_events++;
         });
 
         let documents = data.documents;
         documents.forEach(document__ => {
-            console.log(document__);
             let doc = createDocumentDiv(document__.title, "", document__.last_modified, document__.id);
             document.querySelector('.div_documents').appendChild(doc);
         });
 
         let projects = data.projects;
         projects.forEach(project => {
-            console.log(project);
             let proj = createProjectDiv(project.title, "", project.last_modified, project.id);
             document.querySelector('.div_projects').appendChild(proj);
         });
@@ -144,7 +250,7 @@ function createDocumentDiv(title, content, time,id) {
     docDiv.appendChild(timeContribDiv);
 
     docDiv.addEventListener('click', () => {
-        window.location.href = `/editor2?id=${id}`;
+        window.location.href = `/editor?id=${id}`;
     });
 
     return docDiv;
@@ -272,7 +378,7 @@ async function create_document_base() {
         });
         const data = await response.json();
         if (data.success) {
-            window.location.href = `/editor2?id=${data.id}`;
+            window.location.href = `/editor?id=${data.id}`;
         } else {
             console.error('Error creating document:', data.message);
         }

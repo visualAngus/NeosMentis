@@ -75,21 +75,21 @@ app.get('/', (req, res) => {
     }
 });
 
+// app.get('/editor3', (req, res) => {
+//     let data = verificationAll(req, res);
+//     if (!data) {
+//         return res.redirect('/log');
+//     }
+
+//     res.sendFile('./public/html/editor3.html', { root: __dirname })
+// });
 app.get('/editor', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
     }
 
-    res.sendFile('./public/html/editor.html', { root: __dirname })
-});
-app.get('/editor2', (req, res) => {
-    let data = verificationAll(req, res);
-    if (!data) {
-        return res.redirect('/log');
-    }
-
-    res.sendFile('./public/html/editorv2.html', { root: __dirname })
+    res.sendFile('./public/html/editor3.html', { root: __dirname })
 });
 app.get('/agenda', (req, res) => {
     let data = verificationAll(req, res);
@@ -128,6 +128,78 @@ app.post('/uploadFile', upload.single('file'), (req, res) => {
     });
 });
 app.use('/uploads', express.static('uploads'));
+
+app.post('/upload_image', upload.single('image'), (req, res) => {
+
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    if (!req.file) {
+        return res.status(400).json({ success: 0, message: 'No file uploaded' });
+    }
+
+    connection.query('INSERT INTO images SET url = ?, user_id_link = ?', [`/uploads/${req.file.filename}`, data.userID], (error, _results) => {
+        if (error) {
+            return res.json({ success: 0, message: error.message });
+        }
+
+        const fileData = {
+            url: `/uploads/${req.file.filename}`,
+            name: req.file.originalname,
+            size: req.file.size,
+            extension: path.extname(req.file.originalname).substring(1)
+        };
+
+        return res.json({ success: 1, file: fileData });
+    });
+});
+app.get('/get_user_pictures', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    connection.query('SELECT * FROM images WHERE user_id_link = ? ORDER BY date LIMIT 100', [data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, images: results });
+    });
+});
+
+app.post('/delete_image', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+
+    const ImageURL = req.body.url;
+    connection.query('SELECT url FROM images WHERE url = ? AND user_id_link = ?', [ImageURL, data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'Image not found' });
+        }
+
+        const imageUrl = results[0].url;
+        fs.unlink(path.join(__dirname, imageUrl), (err) => {
+            if (err) {
+                return res.json({ success: false, message: err.message });
+            }
+
+            connection.query('DELETE FROM images WHERE url = ? AND user_id_link = ?', [imageUrl, data.userID], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Image deleted successfully' });
+            });
+        });
+    });
+});
 
 
 app.post('/save_document', (req, res) => {
@@ -408,8 +480,8 @@ app.get('/get_all_user_info', (req, res) => {
     }
 
     let currentDate = new Date();
-    currentDate.setHours(0, 1, 0, 0);
-    currentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+    // currentDate.setHours(0, 1, 0, 0);
+    // currentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
 
     let twoWeeksLater = new Date();
     twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
@@ -426,7 +498,7 @@ app.get('/get_all_user_info', (req, res) => {
         }
         results[0].home_settings = JSON.parse(results[0].home_settings);
         results[0].style_settings = JSON.parse(results[0].style_settings);
-        connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND startTime BETWEEN ? AND ? ORDER BY startTime",
+        connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND endTime BETWEEN ? AND ? ORDER BY startTime",
             [data.userID, currentDate, twoWeeksLater], (error, results__) => {
                 if (error) {
                     return res.json({ success: false, message: error.message });
@@ -528,7 +600,7 @@ app.get('/agenda/agenda_events', (req, res) => {
         }, {});
         return res.json({ success: true, events: groupedEvents });
     });
-});
+}); 
 
 app.post('/agenda/save_agenda_event', (req, res) => {
     let data = verificationAll(req, res);
@@ -642,6 +714,20 @@ app.get('/carte/get_carte_settings', (req, res) => {
         }
 
         return res.json({ success: true, data: results[0] });
+    });
+});
+app.post('/carte/delete_task', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id = req.body.id;
+    const id_project = req.body.id_project;
+    connection.query('DELETE FROM tasks WHERE id_tache = ? AND project_id_link = ?', [id,id_project], (error, _results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, message: 'Event deleted successfully' });
     });
 });
 

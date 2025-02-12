@@ -141,8 +141,10 @@
         div2.className = 'contextmenu-item';
         div2.id = 'edit';
         div2.innerHTML = 'Edit';
+
         div2.addEventListener('click', () => {
             console.log('edit');
+            document.location.href = `/editor?id=${id_doc}`;
         });
 
         div.appendChild(div1);
@@ -158,8 +160,9 @@
     // gérer le clique droit sur les divs
     document.addEventListener('mousedown', (e) => {
         if (e.button === 2) {
-            if (e.target.classList.contains('document_div')) {
-                contextmenu(e.clientX, e.clientY, e.target.id);
+            removeContextMenu();
+            if (e.target.closest('.document_div').classList.contains('document_div')) {
+                contextmenu(e.clientX, e.clientY, e.target.closest('.document_div').id);
             }
 
         }

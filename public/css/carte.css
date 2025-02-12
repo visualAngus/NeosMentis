@@ -12,7 +12,7 @@ body{
     top: 50%;
     right: 0;
 
-    transform: translateY(-50%);
+    transform: translateY(25%);
 
     border-radius: 20px 0 0 20px;
 
@@ -32,10 +32,12 @@ body{
     padding-bottom: 20px;
     box-shadow: 5px 5px 10px 2px var(--blue-shadow);
 
+    z-index: 101;
+
 }
 .div_menu.unselected{
     transition: transform 0.3s var(--transition);
-    transform: translateY(-50%) translateX(100%);
+    transform: translateY(25%) translateX(100%);
 }
 .bloc {
     min-width: 200px;
@@ -70,15 +72,12 @@ body{
 .bloc.done{
     background-color: var(--green-middle-soft);
 }
-.bloc.in_progress{
-    animation: blink 2s infinite;
-}
 .bloc.have_to_start{
     animation: blink_orange 2s infinite;
 }
-
-.bloc.waiting{
+.bloc.waiting {
     background-color: var(--white);
+
 }
 
 
@@ -213,8 +212,8 @@ body{
     border-radius: 10px;
 
     top: -30px;
-    left: 0;
-    transform: translateX(-45%) translateY(-60%) rotate(-23.2deg);
+    right: 0;
+    transform: translateX(50%) translateY(-55%) rotate(26.2deg);
     padding: 5px;
 
     display: flex;
@@ -670,5 +669,5 @@ input[type="number"] {
     border: 1px solid var(--gray-light);
     border-radius: 20px;
 
-    z-index: 99 !important;
+    z-index: 98 !important;
 }

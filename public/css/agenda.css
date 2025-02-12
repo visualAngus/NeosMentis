@@ -187,7 +187,7 @@ main{
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 10px;
+    padding: 5px 10px 10px 10px ;
     gap: 5px;
     margin: 5px;
 
@@ -199,8 +199,9 @@ main{
     user-select: none;
 
     color: var(--white);
+    
 
-    border: 1.5px solid var(--gray-opacity);
+    /* border: 1.5px solid var(--gray-opacity); */
 
     overflow: hidden;
 
@@ -231,7 +232,7 @@ main{
 }
 
 .titre_event{
-    font-size: 1em;
+    font-size: 0.87em;
     font-weight: 600;
     color: white;
     min-height: 20px;
@@ -240,6 +241,11 @@ main{
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 
@@ -475,9 +481,9 @@ main{
     color: var(--white);
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
-    font-weight: 600;
+    font-weight: 700;
     font-style: normal;
-    font-size: 1.35em;
+    font-size: 1em;
 }
 .heure_event{
     color: var(--white);
@@ -485,7 +491,7 @@ main{
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-    font-size: 1em;
+    font-size: 0.8em;
 }
 #titre_event_pop{
     width: 100%;
@@ -601,4 +607,20 @@ main{
 .document_link_pop a:hover,.link_pop a:hover{
     color: var(--blue);
     text-decoration: underline;
+}
+
+.error_div{
+    position: absolute;
+    width: 80%;
+    overflow: hidden;
+    height: 20px;
+
+    bottom: 18px;
+    left: 35px;
+
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: var(--error-color);
 }

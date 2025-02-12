@@ -40,14 +40,26 @@
     --rouge-ok: #eb4444;
     --orange-ok: #f3a531;
     --vert-ok: #6bbd72;
+
+    --error-color : #ec3030;
+
+
+    --event-color1: #FFB3BA; /* Pastel Pink */
+    --event-color2: #BAFFC9; /* Pastel Green */
+    --event-color3: #BAE1FF; /* Pastel Blue */
+    --event-color4: #FFE4B5; /* Pastel Peach */
+    --event-color5: #E0BBE4; /* Pastel Purple */
+    --event-color6: #957DAD; /* Pastel Lavender */
+    --event-color7: #FEC8D8; /* Pastel Salmon */
+    --event-color8: #D4F0F0; /* Pastel Turquoise */
+    --event-color9: #FFDFD3; /* Pastel Coral */
+    --event-color10: #DCE9BE; /* Pastel Lime */
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    user-select: none;
-    -moz-user-select: none;
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -55,16 +67,16 @@
 }
 
 * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--gray-dark) transparent;
+    scrollbar-width:thin;
+    scrollbar-color: var(--gray-light) transparent;
 }
 
 *::-webkit-scrollbar {
-    width: 5px;
+    width: 4px;
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: var(--gray-dark);
+    background-color: var(--gray-light);
     border-radius: 10px;
 }
 
@@ -72,7 +84,7 @@
     position: absolute;
     z-index: 1000;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: var(--text-color);
 
     display: flex;

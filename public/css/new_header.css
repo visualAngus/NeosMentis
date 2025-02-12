@@ -28,7 +28,7 @@ header{
     
     user-select: none;
 
-    z-index: 1000;
+    z-index: 99;
 
     box-shadow: 5px 5px 10px -0px var(--blue-shadow);
     
