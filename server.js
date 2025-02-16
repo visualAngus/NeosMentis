@@ -488,8 +488,6 @@ app.post('/register_with_google', (req, res) => {
     const email = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).email;
     const sub = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).sub;
 
-    console.log("sub:", sub);
-
     const sub_hash = crypto.createHash('sha256').update(sub).digest('hex');
 
     connection.query('SELECT * FROM users WHERE user_password = ?', [sub_hash], async (error, results) => {
@@ -548,9 +546,14 @@ app.get('/login_with_google_sub', (req, res) => {
     }
     const credential = req.cookies.credential;
 
-    const sub = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).sub;
+    try{
+        const sub = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).sub;
+        const sub_hash = crypto.createHash('sha256').update(sub).digest('hex');
 
-    const sub_hash = crypto.createHash('sha256').update(sub).digest('hex');
+    }catch(e){
+        return res.json({ success: false, message: 'Invalid token' });
+    }
+
 
     // verifier le sub au près de google 
     verifyGoogleToken(credential).then(result => {

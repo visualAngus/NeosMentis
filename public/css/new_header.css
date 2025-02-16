@@ -23,8 +23,10 @@ header{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    position: relative;
     
-    overflow: hidden;
+    /* overflow: hidden; */
     
     user-select: none;
 
@@ -127,6 +129,9 @@ header{
     font-size: 0.8em;
 
     padding: 5px 10px;
+    cursor: pointer;
+
+    position: relative;
 }
 
 
@@ -187,4 +192,45 @@ header{
     .div_titre_welcome{
         width: 80%;
     }
+}
+
+
+.div_stt_profil{
+    width: 150px;
+    background-color: var(--white);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    
+    transform: translateY(100%) translateX(-35px);
+
+    box-shadow: 5px 10px 10px -0px var(--blue-shadow);
+
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+}
+.div_profil,.div_settings,.div_logout{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 5px 10px;
+
+    cursor: pointer;
+
+    transition: all 0.2s var(--transition);
+}
+
+.div_profil:hover,.div_settings:hover,.div_logout:hover{
+    background-color: var(--green-soft);
+    border-radius: 10px;
 }
