@@ -1409,14 +1409,19 @@ function decryptDocument(encryptedDocKey, userSecondaryKey, encryptedData) {
 }
 
 async function verifyGoogleToken(idToken) {
-    const ticket = await client.verifyIdToken({
-        idToken: idToken,
-        audience: CLIENT_ID,  // Peut être un tableau d'IDs pour plus de sécurité
-    });
-    const payload = ticket.getPayload();
+    try{
+        const ticket = await client.verifyIdToken({
+            idToken: idToken,
+            audience: CLIENT_ID,  // Peut être un tableau d'IDs pour plus de sécurité
+        });
+        const payload = ticket.getPayload();
+
+        return payload;
+    }catch(error){
+        return null;
+    }
     
     // Tu peux maintenant récupérer les informations supplémentaires de Google People API
-    return payload;
 }
 
 // Fonction pour déchiffrer le texte avec la clé secondaire
