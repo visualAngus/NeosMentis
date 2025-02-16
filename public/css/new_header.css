@@ -65,7 +65,7 @@ header{
     justify-content: flex-end;
     align-items: center;
 
-    gap: 50px;
+    gap: 10px;
 }
 .div_home_bnt{
     display: flex;
@@ -127,4 +127,64 @@ header{
     font-size: 0.8em;
 
     padding: 5px 10px;
+}
+
+
+@media screen and (max-width:850px){
+    body{
+        overflow: hidden;
+    }
+    header{
+        width: 90%;
+        border-radius: 0 35px 35px 0;
+        justify-content: center;
+
+        transform: translateX(-5%);
+    }
+    header div{
+        width: 100%;
+        justify-content: center;
+    }
+    header div a{
+        font-size: 1.2em;
+    }
+    .div_acces_header,.div_compte_header,.div_header_r{
+        display: none;
+    }
+    .div_center_header h1{
+        font-size: clamp(2em, 8vw, 3em);
+    }
+    .div_param_acc_tel{
+        position: absolute;
+
+        left: 0;
+        top: 10px;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 50px;
+        height: 50px;
+
+        cursor: pointer;
+        transition: all 0.2s var(--transition);
+    }
+    .ligne{
+        width: 2px;
+        height: 50%;
+        background-color: var(--text-color);
+        padding: 0px;
+    }
+    .div_param_acc_tel:active{
+        transform: rotate(90deg);
+        
+        .ligne{
+            background-color: var(--violet);
+        }
+    }
+    .div_titre_welcome{
+        width: 80%;
+    }
 }

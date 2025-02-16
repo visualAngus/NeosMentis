@@ -23,7 +23,7 @@ main{
     background-color: var(--green-soft);
     border-radius: var(--border-radius);
 
-    margin-top: 50px;
+    margin-top: 20px;
     padding: 10px 20px;
 
     display: flex;
@@ -198,7 +198,7 @@ main{
     justify-content: flex-start;
     gap: 10px;
 }
-.add_doc, .open_agenda, .add_project{
+.add_doc, .open_agenda, .add_project,.add_colaborator{
     border: none;
     outline: none;
 
@@ -417,4 +417,105 @@ main{
     justify-content: center;
 
     text-align: center;
+}
+
+.menu_choix{
+    margin-top: 15px;
+    width: 100%;
+    height:50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+}
+.menu_choix button{
+    border: none;
+    outline: none;
+
+    width: 200px;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    color: var(--text-color);
+    font-size: 1em;
+
+    background-color: var(--white);
+    padding: 5px 10px;
+
+    transition: all 0.2s var(--transition);
+
+    box-shadow: 5px -0px 10px var(--blue-shadow-soft);
+
+    transition: all 0.3s var(--transition);
+
+    cursor: pointer;
+}
+.menu_choix :first-child{
+    border-radius: 20px 0 0 20px;
+}
+
+.menu_choix :last-child{
+    border-radius: 0 20px 20px 0;
+}
+
+.active_menu:hover{
+    background-color: var(--blue);
+}
+.active_menu.selected:hover{
+    background-color: var(--blue-middle);
+}
+
+.active_menu.selected{
+    background-color: var(--blue-middle);
+}
+
+
+/* div_collaborators */
+.div_collaborators{
+    width: calc(100% + 50px);
+    transform: translateX(-25px);
+
+    max-height: 150px;
+    padding: 25px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 20px;
+
+    overflow: auto;
+}
+.collaborator_div{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+    padding: 10px;
+
+    background-color: var(--green-soft);
+
+    box-shadow: 5px 5px 4px var(--blue-shadow-soft);
+
+    transition: all 0.2s var(--transition);
+    cursor: pointer;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--text-color);
+    font-size: 1.2em;
+
+    user-select: none;
 }

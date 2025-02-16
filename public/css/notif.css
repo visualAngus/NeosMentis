@@ -1,14 +1,14 @@
 .notif{
-    position: absolute;
+    position: fixed;
     z-index: 99000;
 
-    bottom: 0;
+    bottom: 20px;
     left: 0;
 
     min-width: 150px;
     min-height: 50px;
 
-    border-radius: 0 10px 0 0;
+    border-radius: 0 10px 10px 0;
 
     box-shadow: 10px 10px 12px 0px var(--blue-shadow);
 

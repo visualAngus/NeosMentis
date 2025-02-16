@@ -14,16 +14,16 @@ main{
 }
 
 header{
-    width:200px;
-    padding: 0 0px;
-
+    width:fit-content;
+    padding: 0px 20px;
+    justify-content: flex-end;
     position: fixed;
-    left: 2%;
+    right: 2%;
     top: 0;
 
-    border-radius: 35px 5px 5px 35px;
+    border-radius: 5px 35px 35px 5px;
 }
-.div_center_header,.div_compte_header{
+.div_center_header{
     display: none;
 }
 .div_acces_header{
@@ -31,7 +31,7 @@ header{
 }
 .div_bnt_editor{
     margin-top: 10px;
-    border-radius: 5px 20px 20px 5px;
+    border-radius: 35px 5px 5px 35px;
     background-color: var(--white);
 
     width: 80%;
@@ -43,11 +43,13 @@ header{
     justify-content: center;
     gap: 20px;
 
+    padding: 0 20px;
+
     box-shadow: 5px 5px 10px -0px var(--blue-shadow);
 
     position: fixed;
     top: 0;
-    left: 15%;
+    right: 15%;
     z-index: 80;
 
     transition: all 0.3s var(--transition);
@@ -55,7 +57,7 @@ header{
 .div_bnt_editor.scroll{
     width: 12%;
     justify-content: center;
-    left: 15%;
+    right: 15%;
     .title{
         display: none;
     }
@@ -63,7 +65,7 @@ header{
 .title{
     width: 40%;
     position: absolute;
-    left: 0;
+    left: 25px;
     z-index: -1;
 }
 .title input{
@@ -95,7 +97,7 @@ header{
     justify-content: center;
     gap: 20px;
 
-    transform: translateX(-30%);
+    transform: translateX(30%);
 
 }
 .cdx-button{

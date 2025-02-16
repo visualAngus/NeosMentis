@@ -10,6 +10,7 @@ async function get_all_user_info() {
     const response = await fetch('/get_all_user_info');
     const data = await response.json();
     if (data.success) {
+        console.log(data);
         document.querySelector('.div_profil_bnt').style.display = 'none';
         const div = document.createElement('div');
         div.classList.add('div_profil_name');
@@ -181,6 +182,12 @@ async function get_all_user_info() {
         });
         document.querySelector('.load_div').style.display = 'none';
 
+        let collaborateurs = data.collaborators;
+        collaborateurs.forEach(collaborateur => {
+            let collab = createCollaboratorDiv(collaborateur.name, collaborateur.email, collaborateur.id);
+            document.querySelector('.div_collaborators').appendChild(collab);
+        });
+
     } else {
         console.error('Error fetching users:', data.message);
     }
@@ -300,6 +307,36 @@ function createEventDiv(title, fromDay, fromHour, toDay, toHour,fromdate,color, 
     return eventDiv;
 }
 
+function createCollaboratorDiv(name, email, id) {
+    const collabDiv = document.createElement('div');
+    collabDiv.className = 'collaborator_div';
+    collabDiv.id = id;
+    collabDiv.innerHTML = name.slice(0, 2).toUpperCase();
+
+    collabDiv.addEventListener('click', () => {
+        collabDiv.style.width = '100px';
+        collabDiv.style.height = '50px';
+        collabDiv.style.borderRadius = '10px';
+
+        collabDiv.innerHTML = name;
+
+        let otherCollabs = document.querySelectorAll('.collaborator_div');
+        otherCollabs.forEach(otherCollab => {
+            if (otherCollab.id != id) {
+                otherCollab.style.width = '50px';
+                otherCollab.style.height = '50px';
+                otherCollab.style.borderRadius = '50%';
+                otherCollab.innerHTML = otherCollab.innerHTML.slice(0, 2).toUpperCase();
+            }
+        });
+    });
+
+
+    return collabDiv;
+}
+
+
+
 function createProjectDiv(title, content, time, id) {
     const projectDiv = document.createElement('div');
     projectDiv.className = 'project_div';
@@ -391,4 +428,24 @@ async function create_document_base() {
 document.querySelector('.open_agenda').addEventListener('click', open_agenda);
 function open_agenda() {
     window.location.href = '/agenda';
+}
+
+document.querySelector('.add_project').addEventListener('click', new_project);
+async function new_project() {
+    try {
+        const response = await fetch('/carte/create_project', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = `/carte?project=${data.id}`;
+        } else {
+            console.error('Error creating project:', data.message);
+        }
+    } catch (error) {
+        console.error('Failed to create project:', error);
+    }
 }

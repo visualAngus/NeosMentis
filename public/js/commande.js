@@ -672,40 +672,40 @@ function move_cursor_other(id_other, id_line, position) {
     range.detach();
 }
 
-const ws = new WebSocket('ws://192.168.1.74:3000');
+const ws = new WebSocket('ws://88.166.208.243:80');
 
 
 // des que le curseur bouge
 
-// document.addEventListener('selectionchange', () => {
-//     const selection = window.getSelection();
-//     const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-//     const cursor_position = range ? range.startOffset : 0;
+document.addEventListener('selectionchange', () => {
+    const selection = window.getSelection();
+    const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const cursor_position = range ? range.startOffset : 0;
 
-//     let range_elem = range.commonAncestorContainer.parentNode;
+    let range_elem = range.commonAncestorContainer.parentNode;
 
-//     if (range_elem.tagName === "LI") {
-//         range_elem = range_elem.parentElement;
-//         if (range_elem.tagName === "OL" || range_elem.tagName === "UL") {
-//             range_elem = range_elem.parentElement;
-//         }
-//     }
+    if (range_elem.tagName === "LI") {
+        range_elem = range_elem.parentElement;
+        if (range_elem.tagName === "OL" || range_elem.tagName === "UL") {
+            range_elem = range_elem.parentElement;
+        }
+    }
 
-//     const cursor_line = range_elem.id;
+    const cursor_line = range_elem.id;
 
-//     const jsonData = JSON.stringify({
-//         cursor_position: cursor_position,
-//         cursor_line: cursor_line
-//     });
+    const jsonData = JSON.stringify({
+        cursor_position: cursor_position,
+        cursor_line: cursor_line
+    });
 
-//     if (ws.readyState === WebSocket.OPEN) {
-//         ws.send(JSON.stringify({
-//             type: 'cursor_move',
-//             doc: new URLSearchParams(window.location.search).get('id'),
-//             message: jsonData
-//         }));
-//     }
-// });
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'cursor_move',
+            doc: new URLSearchParams(window.location.search).get('id'),
+            message: jsonData
+        }));
+    }
+});
 
 
 

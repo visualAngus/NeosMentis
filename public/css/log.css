@@ -24,6 +24,7 @@ main{
     width: 700px;
     height: 500px;
     border-radius: 35px;
+    position: relative;
 
     display: flex;
     flex-direction: row;
@@ -48,7 +49,8 @@ main{
 }
 .div_sep{
     width: 2px;
-    height: 80%;
+    height: 70%;
+    transform: translateY(-15%);
     background-color: var(--text-color);    
     box-shadow: 10px 10px 12px 0px var(--noir-shadow);
 
@@ -160,4 +162,25 @@ main{
     color: var(--text-color);
     box-shadow: 3px 3px 5px 0px var(--noir-shadow);
 
+}
+
+.conn_google{
+    position: absolute;
+    bottom: 20px;
+    right: 50%;
+    transform: translateX(50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 1em;
+    color: var(--text-color);
 }

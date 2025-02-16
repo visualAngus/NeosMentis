@@ -2,7 +2,7 @@ const endpointOptions_in = {
     isSource: true,
     isTarget: false,
     maxConnections: -1,
-    endpoint: ["Dot", { radius: 5 }],
+    endpoint: ["Dot", { radius: 6 }],
     paintStyle: { fill: "var(--transparent)" },
     connectorStyle: { stroke: "var(--blue-dark)", strokeWidth: 2 },
     connector: ["Bezier", { curviness: 50 }],
@@ -57,7 +57,7 @@ jsPlumb.ready(function () {
         jsPlumb.bind("connection", function (info) {
             const connection = info.connection;
             info.id = "connection_" + connection.sourceId + "_" + connection.targetId;
-            let conn_localStorage = JSON.parse(localStorage.getItem('connections')) || {};
+            let conn_localStorage = JSON.parse(settings_connection_global) || {};
             conn_localStorage = {
                 ...conn_localStorage,
                 [info.id]: {
@@ -65,10 +65,16 @@ jsPlumb.ready(function () {
                     target: connection.targetId
                 }
             };
+            settings_connection_global = JSON.stringify(conn_localStorage);
             localStorage.setItem('connections', JSON.stringify(conn_localStorage));
 
 
             connection.setParameter("info", "fssdfsffe");
+            update_connection_progress();
+
+            save_project_settings(false);
+
+
             // connection.setPaintStyle({ stroke: "yellow" });
             // Ajouter un événement de double-clic pour éditer les informations
             // connection.bind("dblclick", function (conn) {
@@ -84,18 +90,20 @@ jsPlumb.ready(function () {
         jsPlumb.bind("connectionDetached", function (info) {
             const connection = info.connection;
             info.id = "connection_" + connection.sourceId + "_" + connection.targetId;
-            let conn_localStorage = JSON.parse(localStorage.getItem('connections'));
+            let conn_localStorage = JSON.parse(settings_connection_global);
             delete conn_localStorage[info.id];
+            settings_connection_global = JSON.stringify(conn_localStorage);
             localStorage.setItem('connections', JSON.stringify(conn_localStorage));
             // Properly clean up jsPlumb to avoid keeping unnecessary information
             jsPlumb.deleteConnection(connection);
             jsPlumb.repaintEverything();
+            save_project_settings(false);
 
             // get_all_time();
         });
 
 
-        let conn_localStorage = JSON.parse(localStorage.getItem('connections'));
+        let conn_localStorage = JSON.parse(settings_connection_global);
 
         if (conn_localStorage) {
             Object.keys(conn_localStorage).forEach(conn => {
@@ -140,8 +148,6 @@ function open_menu(selected) {
     let heure = Math.floor(time % 24);
     let min = Math.round((time % 1) * 60);
 
-    let contributeurs = selected.querySelector('.div_list_people').children;
-
     let transit_collaborator = {};
 
     div_menu.style.display = 'flex';
@@ -158,6 +164,7 @@ function open_menu(selected) {
 
 
     div_menu.setAttribute('data-selected', selected.id);
+    show_colaborator_in_menu(selected.id);
 }
 
 function closed_menu() {
@@ -218,7 +225,37 @@ function accept_modif(){
     get_all_time();
 }
 
+function show_colaborator_task(id_task){
+    let div_list_people = document.getElementById(id_task).querySelector('.div_list_people');
+    get_collaborator_by_task(id_task).then(data => {
+        div_list_people.innerHTML = '';
+        data.collaborators.forEach(collaborator => {
+            let div_personne = document.createElement('div');
+            div_personne.className = 'people';
+            div_personne.textContent = collaborator.name.slice(0, 2);
+            div_list_people.appendChild(div_personne);
+        });
+    });
+}
+
+function show_colaborator_in_menu(id_task){
+    let div_list_people = div_menu.querySelector('.div_recherche_resultat');
+    let input = div_menu.querySelector('#contributeurs_tache');
+
+    input.value = '';
+    div_list_people.innerHTML = '';
+    get_collaborator_by_task(id_task).then(data => {
+        data.collaborators.forEach(collaborator => {
+            let div_personne = document.createElement('div');
+            div_personne.className = 'div_result';
+            div_personne.textContent = collaborator.name.slice(0, 2);
+            div_list_people.appendChild(div_personne);
+        });
+    });
+}
+
 document.querySelector('#contributeurs_tache').addEventListener('input', async function () {
+    let id_task = div_menu.getAttribute('data-selected');
     let value = this.value;
     let div_recherche_resultat = document.querySelector('.div_recherche_resultat');
 
@@ -244,18 +281,20 @@ document.querySelector('#contributeurs_tache').addEventListener('input', async f
 
                         div_result.setAttribute("data-clicked", "true");
                     } else {
-                        div_result.innerHTML = collaborator.name.slice(0, 2);
-                        div_result.setAttribute("data-clicked", "false");
-                        transit_collaborator[collaborator.id] = collaborator.name;
-                        div_result.setAttribute("selcted", "true");
-                        document.querySelector('#contributeurs_tache').value = '';
-                        document.querySelector('#contributeurs_tache').dispatchEvent(new Event('input'));
+                        let response = await add_contributor_to_task(id_task, collaborator.id);
+                        if (response.success == true) {
+                            show_colaborator_in_menu(id_task);
+                            show_colaborator_task(id_task);
+                        }else{
+                            alert(response.message);
+                        }
                     }
                 });
             });
         });
     }else{
         div_recherche_resultat.innerHTML = '';
+        show_colaborator_in_menu(id_task);
     }
 });
 
@@ -286,7 +325,7 @@ div_menu.querySelector(".div_supp_event").addEventListener('click', function () 
         count++;
     }
     jsPlumb.remove(selected);
-    let blocs = JSON.parse(localStorage.getItem('blocs'));
+    let blocs = JSON.parse(settings_bloc_global);
     delete blocs[selected.id];
     localStorage.setItem('blocs', JSON.stringify(blocs));
     delete_task(id);
@@ -300,3 +339,94 @@ document.addEventListener('keydown', function (e) {
         accept_modif();
     }
 });
+
+function update_graphic_task(id_task, title, time, progress, description, contributeurs) {
+    let selected = document.getElementById(id_task);
+    selected.querySelector('h2').textContent = title;
+    selected.querySelector('p').textContent = description;
+    selected.querySelector('.div_temps_tache').textContent = convert_float_to_hours(time);
+    selected.setAttribute('data-time', time);
+    selected.setAttribute('data-progress', progress);
+    let etat = '';
+    if (progress > 0 && progress < 100) {
+        selected.querySelector('.div_etat').textContent = 'In progress';
+        etat = 'In progress';
+    } else if (progress == 100) {
+        selected.querySelector('.div_etat').textContent = 'Done';
+        etat = 'Done';
+    } else {
+        selected.querySelector('.div_etat').textContent = 'Wainting';
+        etat = 'Waiting';
+    }
+
+    //  update position
+    let blocs = JSON.parse(settings_bloc_global);
+    let bloc = blocs[id_task];
+
+    selected.style.left = bloc.position.x + 'px';
+    selected.style.top = bloc.position.y + 'px';
+    jsPlumb.repaintEverything();
+
+    show_colaborator_task(id_task);
+}
+
+async function refresh() {
+    let blocs = JSON.parse(localStorage.getItem('blocs'));
+    let tasks = await get_all_project_tasks_infos(id_project);
+    await get_project_settings();
+    tasks.forEach(task => {
+        if (blocs[task.id_tache] == null) {
+            let new___ = create_tache(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.etat, task.description, task.contributeurs);
+            // rajouter le nouveau bloc dans le local storage
+            blocs[task.id_tache] = {
+                position: {
+                    x: 0,
+                    y: 0
+                }
+            };
+        }else{
+            update_graphic_task(task.id_tache, task.title, task.duree_theorique, task.pourcentage_avancemennt, task.description, task.contributeurs);
+        }
+    });
+    localStorage.setItem('blocs', JSON.stringify(blocs));
+
+    let conn_localStorage = JSON.parse(settings_connection_global);
+    let allConnections = jsPlumb.getAllConnections();
+
+    // Remove connections that are no longer in settings_connection_global
+    allConnections.forEach(connection => {
+        if (connection.sourceId && connection.targetId) {
+            let connectionId = "connection_" + connection.sourceId + "_" + connection.targetId;
+            if (!conn_localStorage[connectionId]) {
+                jsPlumb.deleteConnection(connection);
+            }
+        }
+    });
+
+    // Add connections that are in settings_connection_global but not in jsPlumb
+    Object.keys(conn_localStorage).forEach(conn => {
+        var existingConnection = jsPlumb.getConnections({
+            source: conn_localStorage[conn].source,
+            target: conn_localStorage[conn].target
+        });
+
+        if (existingConnection.length === 0) {
+            var endpointsOnFsdhg = jsPlumb.selectEndpoints({ element: conn_localStorage[conn].source });
+            var endpointsOnFsd = jsPlumb.selectEndpoints({ element: conn_localStorage[conn].target });
+            jsPlumb.connect({
+                source: endpointsOnFsdhg.get(1),
+                target: endpointsOnFsd.get(0),
+                paintStyle: { stroke: "var(--blue)", strokeWidth: 2 },
+                connectorStyle: { stroke: "var(--blue)", strokeWidth: 2 },
+                connector: ["Bezier", { curviness: 50 }],
+                cssClass: "connection1",
+                detachable: true,
+            });
+        }
+    });    
+
+    setTimeout(() => {
+        get_all_time();
+    }, 500);
+
+}

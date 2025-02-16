@@ -8,6 +8,8 @@ let avancement = 0;
 let max_path = [];
 let time_left = 0;
 let date_start;
+let settings_connection_global;
+let settings_bloc_global;
 
 
 
@@ -24,7 +26,7 @@ function create_tache(id, titre, temps, pourcentage, etat, description, contribu
     const divBtnClose = document.createElement('div');
     // Définir les classes et IDs
     newBloc.id = id;
-    let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+    let actual_localStorage = JSON.parse(settings_bloc_global) || {};
     if (actual_localStorage[id]) {
         newBloc.style.top = actual_localStorage[id].position.y + 'px';
         newBloc.style.left = actual_localStorage[id].position.x + 'px';
@@ -110,8 +112,7 @@ function create_tache(id, titre, temps, pourcentage, etat, description, contribu
 
 
     divBtnClose.addEventListener('click', function () {
-        let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
-
+        let actual_localStorage = JSON.parse(settings_bloc_global) || {};
 
         if (newBloc.style.height !== '0px') {
             newBloc.style.height = '0px';
@@ -154,7 +155,7 @@ function create_tache(id, titre, temps, pourcentage, etat, description, contribu
             };
 
         }
-
+        settings_bloc_global = JSON.stringify(actual_localStorage);
         localStorage.setItem('blocs', JSON.stringify(actual_localStorage));
     });
 
@@ -169,7 +170,7 @@ function create_tache(id, titre, temps, pourcentage, etat, description, contribu
         },
         stop: function (event) {
 
-            let actual_localStorage = JSON.parse(localStorage.getItem('blocs')) || {};
+            let actual_localStorage = JSON.parse(settings_bloc_global) || {};
 
             if (!actual_localStorage[newBloc.id]) {
                 actual_localStorage = {
@@ -189,12 +190,14 @@ function create_tache(id, titre, temps, pourcentage, etat, description, contribu
                     closed: actual_localStorage[newBloc.id].position.closed
                 };
             }
+            settings_bloc_global = JSON.stringify(actual_localStorage);
             localStorage.setItem('blocs', JSON.stringify(actual_localStorage));
             save_project_settings(false);
 
         }
     });
 
+    show_colaborator_task(newBloc.id);
     return newBloc;
 }
 
@@ -284,9 +287,45 @@ function total_time_from_path(path) {
     });
     return total_time;
 }
+function update_connection_progress() {
+    jsPlumb.getAllConnections().forEach(function (conn) {
+
+        conn.addOverlay(["Arrow", { location: 1, width: 10, length: 10 }]);
+
+        // Add an overlay to the connection
+        let elem = document.getElementById(conn.sourceId);
+
+        if (!elem.getAttribute('data-progress')) {
+            elem.setAttribute('data-progress', 100);
+        }
+        let progress = (elem.getAttribute('data-progress'));
+        let random_id = Math.random().toString(36).substring(7);
+        // verify if the id is already used
+        while (document.getElementById(random_id)) {
+            random_id = Math.random().toString(36).substring(7);
+        }
+
+        conn.addOverlay(["Label", {
+            label: progress,
+            cssClass: "aLabel " + random_id
+        }]);
+        let div_pourcentage = document.createElement('div');
+        div_pourcentage.className = 'div_pourcentage';
+        div_pourcentage.style.width = progress + '%';
+
+        if (progress == 100) {
+            div_pourcentage.style.backgroundColor = 'var(--vert-ok)';
+        }
+
+
+        document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
+    });
+    jsPlumb.repaintEverything();
+}
+
+
 
 function get_all_time() {
-    // console.log('get_all_time');
     let json_layer = {}
     let sourceDepthMap = {};
 
@@ -439,39 +478,7 @@ function get_all_time() {
         div.remove();
     });
 
-    // enumerate all the connections, and add overlays to them.
-    jsPlumb.getAllConnections().forEach(function (conn) {
-
-        conn.addOverlay(["Arrow", { location: 1, width: 10, length: 10 }]);
-
-        // Add an overlay to the connection
-        let elem = document.getElementById(conn.sourceId);
-
-        if (!elem.getAttribute('data-progress')) {
-            elem.setAttribute('data-progress', 100);
-        }
-        let progress = (elem.getAttribute('data-progress'));
-        let random_id = Math.random().toString(36).substring(7);
-        // verify if the id is already used
-        while (document.getElementById(random_id)) {
-            random_id = Math.random().toString(36).substring(7);
-        }
-
-        conn.addOverlay(["Label", {
-            label: progress,
-            cssClass: "aLabel " + random_id
-        }]);
-        let div_pourcentage = document.createElement('div');
-        div_pourcentage.className = 'div_pourcentage';
-        div_pourcentage.style.width = progress + '%';
-
-        if (progress == 100) {
-            div_pourcentage.style.backgroundColor = 'var(--vert-ok)';
-        }
-
-
-        document.getElementsByClassName(random_id)[0].appendChild(div_pourcentage);
-    });
+    update_connection_progress();
     jsPlumb.repaintEverything();
     update_header();
 }
@@ -480,7 +487,6 @@ function update_header(){
 
 
     time_left = 0;
-    console.log("max_path :",max_path);
     max_path.slice(0,-1).forEach(path => {
         let elem = document.getElementById(path);
         if (elem){
@@ -534,14 +540,13 @@ async function save_project_settings(auto = true) {
     if (auto) {
         return;
     }
-    let connections = JSON.parse(localStorage.getItem('connections')) || {};
-    let blocs = JSON.parse(localStorage.getItem('blocs')) || {};
+    let connections = JSON.parse(settings_connection_global) || {};
+    let blocs = JSON.parse(settings_bloc_global) || {};
 
     if (Object.keys(connections).length === 0 && Object.keys(blocs).length === 0) {
         console.error('No data to save');
         return;
     }
-
     const response = await fetch('/carte/save_carte_settings', {
         method: 'POST',
         headers: {
@@ -559,9 +564,11 @@ async function save_project_settings(auto = true) {
         console.error('Error saving settings:', data.message);
     }
 
+    send_update();
 }
 
 async function get_project_settings() {
+    console.log('get_project_settings');
     const response = await fetch('/carte/get_carte_settings', {
         method: 'GET',
         headers: {
@@ -574,6 +581,8 @@ async function get_project_settings() {
         let settings_bloc = data.data.settings_bloc;
         localStorage.setItem('connections', settings_connection);
         localStorage.setItem('blocs', settings_bloc);
+        settings_connection_global = settings_connection;
+        settings_bloc_global = settings_bloc;
         if (data.data.date_start != null){
             date_start = new Date(data.data.date_start);
         }
@@ -660,6 +669,23 @@ async function get_all_project_tasks(id_project) {
     }
 
 }
+async function get_all_project_tasks_infos(id_project) {
+    const response = await fetch('/carte/get_all_project_tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id_project: id_project
+        })
+    });
+    const data = await response.json();
+    if (data.success) {
+        return data.tasks;
+    } else {
+        console.error('Error adding task:', data.message);
+    }
+}
 
 async function update_task(id, titre, temps, pourcentage, etat, description, contributeurs, link_ressources, materiels) {
     const response = await fetch('/carte/update_task', {
@@ -686,8 +712,8 @@ async function update_task(id, titre, temps, pourcentage, etat, description, con
         console.error('Error updating task:', data.message);
     }
 
+    send_update();
 }
-
 
 document.addEventListener('mousedown', function (e) {
 

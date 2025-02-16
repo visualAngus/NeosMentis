@@ -286,7 +286,8 @@ setTimeout(() => {
 // Exemple d'utilisation : Ajouter "A" à la position 5 du premier bloc
 
 // Connecter au serveur WebSocket
-const ws = new WebSocket('ws://localhost:3000');
+const ws = new WebSocket('ws://88.166.208.243:80');
+
 
 // envoyer un message au serveur
 ws.onopen = () => {

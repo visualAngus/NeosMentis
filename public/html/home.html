@@ -32,7 +32,7 @@
         </div>
         <div class="div_center_header">
             <img src="/logo/logo_N.png" alt="logo">
-            <h1>
+            <h1 >
                 NeosMentis
             </h1>
         </div>
@@ -69,12 +69,20 @@
         <div class="div_titre_welcome">
             <h1></h1>
         </div>
+        <div class="menu_choix">
+            <button class="active_menu selected" id="all">All</button>
+            <button class="active_menu" id="document">Documents</button>
+            <button class="active_menu" id="event">Events</button>
+            <button class="active_menu" id="project">Projects</button>
+            <button class="active_menu" id="collaborator">Collaborators</button>
+        </div>
+
         <div class="div_research">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 20 20" fill="none">
                 <path fill-rule="evenodd" clip-rule="evenodd"
                     d="M19.5306 18.4694L14.8366 13.7762C17.6629 10.383 17.3204 5.36693 14.0591 2.38935C10.7978 -0.588237 5.77134 -0.474001 2.64867 2.64867C-0.474001 5.77134 -0.588237 10.7978 2.38935 14.0591C5.36693 17.3204 10.383 17.6629 13.7762 14.8366L18.4694 19.5306C18.7624 19.8237 19.2376 19.8237 19.5306 19.5306C19.8237 19.2376 19.8237 18.7624 19.5306 18.4694ZM1.75 8.5C1.75 4.77208 4.77208 1.75 8.5 1.75C12.2279 1.75 15.25 4.77208 15.25 8.5C15.25 12.2279 12.2279 15.25 8.5 15.25C4.77379 15.2459 1.75413 12.2262 1.75 8.5Z" />
             </svg>
-            <input type="text" placeholder="Search document" id="search_project">
+            <input type="text" placeholder="You research something ?">
         </div>
         <div class="titre_section">
             <h2>All documents</h2>
@@ -98,6 +106,14 @@
             <button class="add_project">+</button>
         </div>
         <div class="div_projects">
+            
+        </div>
+
+        <div class="titre_section">
+            <h2>Collaborators</h2>
+            <button class="add_colaborator">+</button>
+        </div>
+        <div class="div_collaborators">
             
         </div>
     </main>
@@ -191,22 +207,112 @@
 
     // boucle d'update 
 
-    setInterval(async () => {
-        let active_menu = document.querySelector('.active_menu');
-        if (active_menu) {
-            console.log('active_menu');
-            active_menu.click();
-        }
+    // setInterval(async () => {
+    //     // let active_menu = document.querySelector('.active_menu');
+    //     // if (active_menu) {
+    //     //     console.log('active_menu');
+    //     //     active_menu.click();
+    //     // }
 
-        await have_request_collaborator().then(data => {
-            if (data.requests.length == 0) {
-                return;
+    //     await have_request_collaborator().then(data => {
+    //         if (data.requests.length == 0) {
+    //             return;
+    //         }
+    //         list_notif_texte.push("Vous avez " + data.requests.length + " demande" + (data.requests.length > 1 ? "s" : "") + " de collaborateur" + (data.requests.length > 1 ? "s" : ""));
+    //     });
+    // }, 10000);
+
+
+
+    let active_menu = document.querySelectorAll('.active_menu');
+
+    let div_research = document.querySelector('.div_research');
+    let div_documents = document.querySelector('.div_documents');
+    let div_events = document.querySelector('.div_events');
+    let div_projects = document.querySelector('.div_projects');
+    let div_collaborators = document.querySelector('.div_collaborators');
+    let titre_section = document.querySelectorAll('.titre_section');
+
+
+    active_menu.forEach((element) => {
+        element.addEventListener('click', async () => {
+            active_menu.forEach((element) => {
+                element.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            let type = element.id;
+            if (type == 'all') {
+                div_research.style.display = 'flex';
+                div_documents.style.display = 'flex';
+                div_events.style.display = 'flex';
+                div_projects.style.display = 'flex';
+                div_collaborators.style.display = 'flex';
+
+                div_research.children[1].placeholder = "You research something ?";
+
+                titre_section.forEach((element) => {
+                    element.style.display = 'flex';
+                });
+
+            }else if (type == "document") {
+                div_research.style.display = 'flex';
+                div_documents.style.display = 'flex';
+                div_events.style.display = 'none';
+                div_projects.style.display = 'none';
+                div_collaborators.style.display = 'none';
+
+                div_research.children[1].placeholder = "Research a document";
+
+                titre_section.forEach((element) => {
+                    element.style.display = 'none';
+                });
+                titre_section[0].style.display = 'flex';
+
+            } else if (type == "event") {
+                div_research.style.display = 'flex';
+                div_documents.style.display = 'none';
+                div_events.style.display = 'flex';
+                div_projects.style.display = 'none';
+                div_collaborators.style.display = 'none';
+
+                div_research.children[1].placeholder = "Research an event";
+
+                titre_section.forEach((element) => {
+                    element.style.display = 'none';
+                });
+                titre_section[1].style.display = 'flex';
+
+            } else if (type == "project") {
+                div_research.style.display = 'flex';
+                div_documents.style.display = 'none';
+                div_events.style.display = 'none';
+                div_projects.style.display = 'flex';
+                div_collaborators.style.display = 'none';
+
+                div_research.children[1].placeholder = "Research a project";
+
+                titre_section.forEach((element) => {
+                    element.style.display = 'none';
+                });
+                titre_section[2].style.display = 'flex';
+
+            } else if (type == "collaborator") {
+                div_research.style.display = 'flex';
+                div_documents.style.display = 'none';
+                div_events.style.display = 'none';
+                div_projects.style.display = 'none';
+                div_collaborators.style.display = 'flex';
+
+                div_research.children[1].placeholder = "Research a collaborator";
+
+                titre_section.forEach((element) => {
+                    element.style.display = 'none';
+                });
+                titre_section[3].style.display = 'flex';
             }
-            list_notif_texte.push("Vous avez " + data.requests.length + " demande" + (data.requests.length > 1 ? "s" : "") + " de collaborateur" + (data.requests.length > 1 ? "s" : ""));
         });
-    }, 10000);
-
-
+    });
 
 </script>
 

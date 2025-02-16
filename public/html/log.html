@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
     <header>
         <div class="div_param_acc_tel">
@@ -87,9 +90,82 @@
                 </div>
 
             </div>
+
+
+            <div class="conn_google">
+                <h3> Or connect with Google</h3>
+                <div id="g_id_onload"
+                    data-client_id="933726926443-mfo0gij5g3f8pol7a6c0icj5h3pl7rtg.apps.googleusercontent.com"
+                    data-callback="handleCredentialResponse">
+                </div>
+
+                <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                    data-text="signin_with" data-shape="pill">
+                </div>
+
+
+            </div>
         </div>
     </main>
 </body>
+<script>
+
+    function login_with_google_auto() {
+        fetch('/login_with_google_sub', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    login_with_google_auto();
+
+
+    function handleCredentialResponse(response) {
+
+        // console.log("Token JWT Google :", response.credential);
+
+        // Décoder le token JWT (optionnel)
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+
+        // alert("Bienvenue " + decodeURIComponent(escape(data.name)));
+
+        let nom = decodeURIComponent(escape(data.name));
+        let email = data.email;
+        let credential = response.credential;
+
+        fetch('/register_with_google', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: nom,
+                email: email,
+                credential: credential
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    alert(data.message,"Please contact the administrator to solve the problem : neosmendis@gmail.com");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+    }
+</script>
 <script>
     let log_btn = document.querySelector('.log_btn');
     let register_btn = document.querySelector('.register_btn');
@@ -160,4 +236,5 @@
     });
 
 </script>
+
 </html>

@@ -65,7 +65,7 @@ body{
 
     border-radius: 0 0 15px 15px;
 
-    padding: 15px 25px 5px 25px;
+    padding: 15px 25px 15px 25px;
 
     transition: background-color 0.3s var(--transition);
 }
@@ -115,6 +115,7 @@ body{
     transform: translateY(-50%);
     box-shadow: 2px 0px 10px 0px var(--blue-shadow);
 
+    cursor: pointer;
 }
 
 .bloc::after{
@@ -131,9 +132,15 @@ body{
     transform: translateY(-50%) translateX(50%);
 
     box-shadow: -2px 0px 10px 0px var(--blue-shadow);
+
+    cursor: pointer;
+
 }
 
+.jtk-endpoint{
+    cursor: pointer;
 
+}
 .div_list_people{
     height: 30px;
     width: 100%;
@@ -159,7 +166,7 @@ body{
     height: 20px;
     aspect-ratio: 1;
     border-radius: 50%;
-    background-color: hotpink;
+    background-color: var(--white);
 
     font-family: "Montserrat", serif;
     font-optical-sizing: auto;
@@ -172,6 +179,8 @@ body{
     align-items: center;
 
     cursor: pointer;
+
+    box-shadow: 2px 2px 5px 0px var(--blue-shadow);
 
 }
 

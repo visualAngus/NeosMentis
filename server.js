@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser');
 const WebSocket = require('ws');
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
+const {OAuth2Client} = require('google-auth-library');
 
 
 
@@ -19,6 +20,7 @@ const { v4: uuidv4 } = require('uuid');
 // Clé secrète pour signer les tokens JWT
 const saltRounds = 10;
 const SECRET_KEY = fs.readFileSync(path.join(__dirname, './certs/private-key.pem'), 'utf8').trim();
+const CLIENT_ID  =  "933726926443-mfo0gij5g3f8pol7a6c0icj5h3pl7rtg.apps.googleusercontent.com"
 // mysql
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -34,15 +36,18 @@ connection.connect(error => {
 
 
 const app = express();
-const PORT = 3000;
+const PORT = 80;
 
 const server = http.createServer(app);
 
 // Ajouter un serveur WebSocket
 const wss = new WebSocket.Server({ server });
 const clients = new Map();
+const client = new OAuth2Client(CLIENT_ID);
 
 const clents_status = new Map();
+const clients_projects = new Map();
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -65,7 +70,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-
+// access aux pages
 app.get('/', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -74,15 +79,14 @@ app.get('/', (req, res) => {
         res.sendFile('./public/html/home.html', { root: __dirname })
     }
 });
-
-// app.get('/editor3', (req, res) => {
-//     let data = verificationAll(req, res);
-//     if (!data) {
-//         return res.redirect('/log');
-//     }
-
-//     res.sendFile('./public/html/editor3.html', { root: __dirname })
-// });
+app.get('/test', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        res.redirect('/log');
+    } else {
+        res.sendFile('./public/html/testgoogle.html', { root: __dirname })
+    }
+});
 app.get('/editor', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -108,6 +112,7 @@ app.get('/carte', (req, res) => {
     res.sendFile('./public/html/carte.html', { root: __dirname })
 });
 
+// requets d'upload de fichier
 app.post('/uploadFile', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: 0, message: 'No file uploaded' });
@@ -168,7 +173,6 @@ app.get('/get_user_pictures', (req, res) => {
         return res.json({ success: true, images: results });
     });
 });
-
 app.post('/delete_image', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -201,7 +205,7 @@ app.post('/delete_image', (req, res) => {
     });
 });
 
-
+// requets liées aux documents
 app.post('/save_document', (req, res) => {
     const content = req.body.data;
     const id = req.body.id;
@@ -236,7 +240,6 @@ app.post('/save_document', (req, res) => {
             });
     });
 });
-
 app.get('/create_document', (req, res) => {
 
     let data = verificationAll(req, res);
@@ -269,7 +272,6 @@ app.get('/create_document', (req, res) => {
         }
     );
 });
-
 app.post('/documents', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -294,13 +296,15 @@ app.post('/documents', (req, res) => {
             const secondaryKey = Buffer.from(req.cookies.secondaryKey, 'hex');
 
             const decryptedContent = decryptDocument(results_[0], secondaryKey, results[0]);
+            if (decryptedContent == "error") {
+                return res.json({ success: false, message: 'Error while decrypting the document' });
+            }    
             results[0].content = decryptedContent;
 
             return res.json({ success: true, documents: results });
         });
     });
 });
-
 app.get('/documents_by_user', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -318,7 +322,6 @@ app.get('/documents_by_user', (req, res) => {
             return res.json({ success: true, documents: results });
         });
 });
-
 app.post('/delete_document', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -340,6 +343,7 @@ app.post('/delete_document', (req, res) => {
     });
 });
 
+// requets liées aux projets
 app.post('/partage_document', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -367,7 +371,6 @@ app.post('/partage_document', (req, res) => {
             });
     });
 });
-
 app.get('/accepter_les_partages', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -405,10 +408,10 @@ app.get('/accepter_les_partages', (req, res) => {
     });
 });
 
+// requets liées aux connexions
 app.get('/log', (req, res) => {
     res.sendFile('./public/html/log.html', { root: __dirname })
 });
-
 app.post('/register', async (req, res) => {
     const username = req.body.username;
     const email = req.body.email;
@@ -439,7 +442,6 @@ app.post('/register', async (req, res) => {
 
         });
 });
-
 app.post('/login', async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -472,7 +474,118 @@ app.post('/login', async (req, res) => {
         return res.json({ success: true, message: 'User logged in successfully' });
     });
 });
+app.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.clearCookie('secondaryKey');
+    res.clearCookie('username');
+    res.redirect('/log');
+});
+app.post('/register_with_google', (req, res) => {
+    const credential = req.body.credential;
 
+    const username = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).name;
+    
+    const email = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).email;
+    const sub = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).sub;
+
+    console.log("sub:", sub);
+
+    const sub_hash = crypto.createHash('sha256').update(sub).digest('hex');
+
+    connection.query('SELECT * FROM users WHERE user_password = ?', [sub_hash], async (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        if (results.length === 0) {
+            connection.query('INSERT INTO users (user_name, email, user_password) VALUES (?, ?, ?)',
+                [username, email, sub_hash], (error, results) => {
+                    if (error) {
+                        return res.json({ success: false, message: error.message });
+                    }
+                    connection.query('INSERT INTO user_settings (user_id_link) VALUES (?)', [results.insertId], (error, _results) => {
+                        if (error) {
+                            return res.json({ success: false, message: error.message });
+                        }
+                        console.log('User registered successfully');
+                        // create a secondary key
+                        const secondaryKey = generateSecondaryKey(SECRET_KEY, sub_hash);
+                        // create a token
+                        const token = generateToken(username, results.insertId);
+                        // set the token in the cookie
+                        res.cookie('token', token, { httpOnly: true });
+                        // set the secondary key in the cookie
+                        res.cookie('secondaryKey', secondaryKey.toString('hex'), { httpOnly: true });
+                        res.cookie('username', username, { httpOnly: true });
+                        res.cookie('credential', credential, { httpOnly: true });
+                        return res.json({ success: true, message: 'User registered successfully' });
+                    });
+
+                });
+        } else {
+            // create a secondary key
+            const secondaryKey = generateSecondaryKey(SECRET_KEY, sub_hash);
+            // create a token
+            const token = generateToken(username, results[0].user_id);
+            // set the token in the cookie  
+            res.cookie('token', token, { httpOnly: true });
+            // set the secondary key in the cookie
+            res.cookie('secondaryKey', secondaryKey.toString('hex'), { httpOnly: true });
+
+            res.cookie('username', username, { httpOnly: true });
+            res.cookie('sub', sub, { httpOnly: true });
+            return res.json({ success: true, message: 'User logged in successfully' });
+        }
+    }
+    );
+
+
+});
+app.get('/login_with_google_sub', (req, res) => {
+
+    if (!req.cookies.sub) {
+        return res.json({ success: false, message: 'No token found' });
+    }
+    const credential = req.cookies.credential;
+
+    const sub = JSON.parse(Buffer.from(credential.split('.')[1], 'base64').toString()).sub;
+
+    const sub_hash = crypto.createHash('sha256').update(sub).digest('hex');
+
+    // verifier le sub au près de google 
+    verifyGoogleToken(credential).then(result => {
+        if (!result) {
+            return res.json({ success: false, message: 'Invalid token' });
+        }
+        else {
+            connection.query('SELECT * FROM users WHERE user_password = ?', [sub_hash], async (error, results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+
+                if (results.length === 0) {
+                    return res.json({ success: false, message: 'User not found' });
+                }
+
+
+                // create a secondary key
+                const secondaryKey = generateSecondaryKey(SECRET_KEY, sub);
+                // create a token
+                const token = generateToken(results[0].user_name, results[0].user_id);
+                // set the token in the cookie
+                res.cookie('token', token, { httpOnly: true });
+                // set the secondary key in the cookie
+                res.cookie('secondaryKey', secondaryKey.toString('hex'), { httpOnly: true });
+
+                res.cookie('username', results[0].user_name, { httpOnly: true });
+                res.cookie('credential', credential, { httpOnly: true });
+                return res.json({ success: true, message: 'User logged in successfully' });
+            });
+        }
+    });
+});
+
+// requets liées aux infos de l'utilisateur
 app.get('/get_all_user_info', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -480,9 +593,6 @@ app.get('/get_all_user_info', (req, res) => {
     }
 
     let currentDate = new Date();
-    // currentDate.setHours(0, 1, 0, 0);
-    // currentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-
     let twoWeeksLater = new Date();
     twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
     twoWeeksLater.setHours(23, 59, 59, 999);
@@ -492,41 +602,89 @@ app.get('/get_all_user_info', (req, res) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
-
         if (results.length === 0) {
             return res.json({ success: true, data: data });
         }
         results[0].home_settings = JSON.parse(results[0].home_settings);
         results[0].style_settings = JSON.parse(results[0].style_settings);
-        connection.query("SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND endTime BETWEEN ? AND ? ORDER BY startTime",
-            [data.userID, currentDate, twoWeeksLater], (error, results__) => {
+        connection.query(
+            "SELECT *, CONVERT_TZ(startTime, '+00:00', '+01:00') as startTime, CONVERT_TZ(endTime, '+00:00', '+01:00') as endTime FROM agenda_events WHERE user_id_link = ? AND endTime BETWEEN ? AND ? ORDER BY startTime",
+            [data.userID, currentDate, twoWeeksLater],
+            (error, results__) => {
                 if (error) {
                     return res.json({ success: false, message: error.message });
                 }
-                connection.query(`SELECT documents.id,documents.title,documents.last_modified 
-                    FROM key_link 
-                    LEFT JOIN documents ON key_link.document_id_link = documents.id
-                    WHERE key_link.user_id_link = ? 
-                    ORDER BY last_modified DESC`
-                    , [data.userID], (error, results) => {
+                connection.query(
+                    `SELECT documents.id,documents.title,documents.last_modified 
+                     FROM key_link 
+                     LEFT JOIN documents ON key_link.document_id_link = documents.id
+                     WHERE key_link.user_id_link = ? 
+                     ORDER BY last_modified DESC`,
+                    [data.userID],
+                    (error, resultsDocs) => {
                         if (error) {
-                            return res.json({ success: true, data: data, settings: results[0], events: results__, documents: [] , projects: []});
+                            return res.json({
+                                success: true,
+                                data: data,
+                                settings: results[0],
+                                events: results__,
+                                documents: [],
+                                projects: []
+                            });
                         }
-                        connection.query(`SELECT projects_key_link.project_id_link as id, projects.title, projects.last_modified
-                            FROM projects_key_link
-                            LEFT JOIN projects ON projects_key_link.project_id_link = projects.id_project 
-                            WHERE projects_key_link.user_id_link = ?`, [data.userID], (error, results_pro) => {
-                        if (error) {
-                            return res.json({ success: true, data: data, settings: results[0], events: results__, documents: results , projects: []});
-                        }
-                        return res.json({ success: true, data: data, settings: results[0], events: results__, documents: results , projects: results_pro});
-                    });
-
-
-                    });
-            });
-
-
+                        connection.query(
+                            `SELECT projects_key_link.project_id_link as id, projects.title, projects.last_modified
+                             FROM projects_key_link
+                             LEFT JOIN projects ON projects_key_link.project_id_link = projects.id_project 
+                             WHERE projects_key_link.user_id_link = ?`,
+                            [data.userID],
+                            (error, resultsPro) => {
+                                if (error) {
+                                    return res.json({
+                                        success: true,
+                                        data: data,
+                                        settings: results[0],
+                                        events: results__,
+                                        documents: resultsDocs,
+                                        projects: []
+                                    });
+                                }
+                                connection.query(
+                                    `SELECT users.user_id as id, users.user_name as name, users.email as email 
+                                     FROM users_link 
+                                     LEFT JOIN users ON (users_link.user2 = users.user_id AND users_link.user1 = ?) 
+                                        OR (users_link.user1 = users.user_id AND users_link.user2 = ?)
+                                     WHERE users.user_id != ?`,
+                                    [data.userID, data.userID, data.userID],
+                                    (error, resultsCol) => {
+                                        if (error) {
+                                            return res.json({
+                                                success: true,
+                                                data: data,
+                                                settings: results[0],
+                                                events: results__,
+                                                documents: resultsDocs,
+                                                projects: resultsPro,
+                                                collaborators: []
+                                            });
+                                        }
+                                        return res.json({
+                                            success: true,
+                                            data: data,
+                                            settings: results[0],
+                                            events: results__,
+                                            documents: resultsDocs,
+                                            projects: resultsPro,
+                                            collaborators: resultsCol   
+                                        });
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
     });
 });
 app.get('/get_all_user_info_only', (req, res) => {
@@ -545,30 +703,8 @@ app.get('/get_all_user_info_only', (req, res) => {
         return res.json({ success: true, data: results[0]});
     });
 });
-app.post('/save_user_settings', (req, res) => {
-    let data = verificationAll(req, res);
-    if (!data) {
-        return res.redirect('/log');
-    }
-    const home_settings = JSON.stringify(req.body.home_settings);
-    const style_settings = JSON.stringify(req.body.style_settings);
-    connection.query('UPDATE user_settings SET home_settings = ?, style_settings = ? WHERE user_id_link = ? ',
-        [home_settings, style_settings, data.userID], (error, results) => {
-            if (error) {
-                return res.json({ success: false, message: error.message });
-            }
 
-            return res.json({ success: true, message: 'Settings saved successfully' });
-        });
-});
-app.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    res.clearCookie('secondaryKey');
-    res.clearCookie('username');
-    res.redirect('/log');
-});
-
-
+// requets liées aux agendas
 app.get('/agenda/agenda_events', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -601,7 +737,6 @@ app.get('/agenda/agenda_events', (req, res) => {
         return res.json({ success: true, events: groupedEvents });
     });
 }); 
-
 app.post('/agenda/save_agenda_event', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -634,7 +769,6 @@ app.post('/agenda/save_agenda_event', (req, res) => {
             });
     }
 });
-
 app.post('/agenda/delete_agenda_event', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -648,7 +782,6 @@ app.post('/agenda/delete_agenda_event', (req, res) => {
         return res.json({ success: true, message: 'Event deleted successfully' });
     });
 });
-
 app.get('/agenda/2weeks', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -670,7 +803,7 @@ app.get('/agenda/2weeks', (req, res) => {
         });
 });
 
-
+// requets liées aux projets
 app.post('/carte/save_carte_settings', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -695,7 +828,6 @@ app.post('/carte/save_carte_settings', (req, res) => {
         return res.json({ success: false, message: 'Invalid data format' });
     }
 });
-
 app.get('/carte/get_carte_settings', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -730,7 +862,6 @@ app.post('/carte/delete_task', (req, res) => {
         return res.json({ success: true, message: 'Event deleted successfully' });
     });
 });
-
 app.post('/carte/add_task', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -761,7 +892,6 @@ app.post('/carte/add_task', (req, res) => {
             });
         });
 });
-
 app.post('/carte/get_all_project_tasks', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -775,7 +905,6 @@ app.post('/carte/get_all_project_tasks', (req, res) => {
         return res.json({ success: true, tasks: results });
     });
 });
-
 app.post('/carte/update_task', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -799,7 +928,6 @@ app.post('/carte/update_task', (req, res) => {
             return res.json({ success: true, message: 'Task updated successfully' });
         });
 });
-
 app.post('/carte/delete_task', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -829,7 +957,86 @@ app.get('/carte/get_all_projects_by_user', (req, res) => {
         return res.json({ success: true, projects: results });
     });
 });
+app.post('/carte/add_contributor_to_task', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_task = req.body.id_task;
+    const id_project = req.body.id_project;
+    const id_user = req.body.id_collaborator;
 
+    connection.query('SELECT * FROM tasks_key_link WHERE task_id_link = ? AND user_id_link = ? AND project_id_link = ?', [id_task, id_user, id_project], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+
+        if (results.length > 0) {
+            return res.json({ success: false, message: 'Contributor already exists' });
+        }else{
+
+            connection.query('INSERT INTO tasks_key_link (task_id_link, user_id_link,project_id_link) VALUES (?, ?, ?)', [id_task, id_user, id_project], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+        
+                connection.query('SELECT * FROM projects_key_link WHERE project_id_link = ? AND user_id_link = ?', [id_project, id_user], (error, results) => {
+                    if (error) {
+                        return res.json({ success: false, message: error.message });
+                    }
+        
+                    if (results.length === 0) {
+                        connection.query('INSERT INTO projects_key_link (project_id_link, user_id_link) VALUES (?, ?)', [id_project, id_user], (error, _results) => {
+                            if (error) {
+                                return res.json({ success: false, message: error.message });
+                            }
+                            return res.json({ success: true, message: 'Contributor added successfully' });
+                        });
+                    } else {
+                        return res.json({ success: true, message: 'Contributor added successfully' });
+                    }
+                });
+            });
+        }
+    });
+});
+app.post('/carte/get_collaborator_by_task', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_task = req.body.id_task;
+    connection.query(`SELECT users.user_id as id, users.user_name as name, users.email 
+                    FROM tasks_key_link 
+                    LEFT JOIN users ON tasks_key_link.user_id_link = users.user_id
+                    WHERE tasks_key_link.task_id_link = ?`, [id_task], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        return res.json({ success: true, collaborators: results });
+    });
+});
+app.get('/carte/create_project', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    let title = 'Nouveau projet' + Math.floor(Math.random() * 1000);
+    connection.query('INSERT INTO projects (title) VALUES (?)', [title], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        connection.query('INSERT INTO projects_key_link (project_id_link, user_id_link) VALUES (?, ?)', [results.insertId, data.userID], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            return res.json({ success: true, message: 'Project created successfully', id: results.insertId });
+        });
+    });
+});
+
+
+// requets liées aux collaborateurs
 app.get('/get_all_collaborators_of_one_user', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -863,7 +1070,7 @@ app.post('/recherche_collaborators', (req, res) => {
             return res.json({ success: true, collaborators: results });
         });
 });
-app.post('/recher_user', (req, res) => {
+app.post('/rechercher_user', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
         return res.redirect('/log');
@@ -879,7 +1086,6 @@ app.post('/recher_user', (req, res) => {
             return res.json({ success: true, users: results });
         });
 });
-
 app.post('/add_collaborator', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -906,7 +1112,6 @@ app.post('/add_collaborator', (req, res) => {
             });
         });
 });
-
 app.post('/request_add_collaborator', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -933,7 +1138,6 @@ app.post('/request_add_collaborator', (req, res) => {
             });
         });
 });
-
 app.get('/have_request_collaborator', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -950,7 +1154,6 @@ app.get('/have_request_collaborator', (req, res) => {
     }
     );
 });
-
 app.post('/accept_request_collaborator', (req, res) => {
     let data = verificationAll(req, res);
     if (!data) {
@@ -1028,6 +1231,17 @@ function verifyToken(token) {
 function verificationAll(req, res) {
     // get le token 
     const token = req.cookies.token;
+
+    const credential = req.cookies.credential;
+    if (credential) {
+        verifyGoogleToken(credential).then(result => {
+            if (!result) {
+                return false;
+            }
+        });
+    }
+
+    
     //get la clé secondaire
     const secondaryKey = req.cookies.secondaryKey;
 
@@ -1173,7 +1387,13 @@ function decryptDocument(encryptedDocKey, userSecondaryKey, encryptedData) {
     decipherKey.setAuthTag(Buffer.from(encryptedDocKey.authTag, 'hex'));
 
     let docKey = decipherKey.update(encryptedDocKey.encryptedData, 'hex', 'utf8');
-    docKey += decipherKey.final('utf8');
+
+    try{
+        docKey += decipherKey.final('utf8');
+    }
+    catch (error) {
+        return "error";
+    }
 
     // 2) Déchiffrer le texte avec la clé du document
     const decipherData = crypto.createDecipheriv(
@@ -1186,6 +1406,17 @@ function decryptDocument(encryptedDocKey, userSecondaryKey, encryptedData) {
     let decrypted = decipherData.update(encryptedData.content, 'hex', 'utf8');
     decrypted += decipherData.final('utf8');
     return decrypted;
+}
+
+async function verifyGoogleToken(idToken) {
+    const ticket = await client.verifyIdToken({
+        idToken: idToken,
+        audience: CLIENT_ID,  // Peut être un tableau d'IDs pour plus de sécurité
+    });
+    const payload = ticket.getPayload();
+    
+    // Tu peux maintenant récupérer les informations supplémentaires de Google People API
+    return payload;
 }
 
 // Fonction pour déchiffrer le texte avec la clé secondaire
@@ -1221,9 +1452,12 @@ wss.on('connection', (ws) => {
     // Gérer les messages reçus
     ws.on('message', (message) => {
         const parsedMessage = JSON.parse(message);
+        const senderID = parsedMessage.from;
 
-        if (parsedMessage.type === 'info') {
-            clents_status.set(clientId, parsedMessage.message);
+        if (parsedMessage.type === 'connection_to_project') {
+            // clents_status.set(clientId, parsedMessage.message);
+            clients_projects.set(clientId, parsedMessage.message);
+            console.log(clients_projects);
         }
         if (parsedMessage.type === 'modification') {
             clents_status.forEach((value, key) => {
@@ -1249,18 +1483,33 @@ wss.on('connection', (ws) => {
                 }
             });
         }
-        console.log(clents_status);
+
+        if (parsedMessage.type === 'update_project') {
+
+            var project_id_from = clients_projects.get(clientId);
+
+
+            clients_projects.forEach((value, key) => {
+                if (value === project_id_from) {
+                    if (key !== clientId) {
+                        console.log(key);
+                        const client = clients.get(key);
+                        if (client) {
+                            client.send(JSON.stringify({ type: 'update_project', from: clientId, message: "update" }));
+                        }
+                    }
+                }
+            });
+        }
 
         // afficher tout les clents_status qui ont parsedMessage.message = "43"
-
-
 
 
         // Exemple : Diffuser à tous les clients sauf l'émetteur
         // const parsedMessage = JSON.parse(message);
         // if (parsedMessage.type === 'broadcast') {
         //     clients.forEach((client, id) => {
-        //         if (id !== clientId) {
+        //         if (id !== clientId) {   
         //             client.send(
         //                 JSON.stringify({
         //                     type: 'broadcast',
@@ -1278,6 +1527,7 @@ wss.on('connection', (ws) => {
         console.log(`Client déconnecté : ${clientId}`);
         clients.delete(clientId);
         clents_status.delete(clientId);
+        clients_projects.delete(clientId);
     });
 });
 

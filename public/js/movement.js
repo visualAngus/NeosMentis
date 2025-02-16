@@ -56,7 +56,7 @@ workspace.addEventListener('wheel', (e) => {
         scale *= (1 - zoomSensitivity);
     }
     scale = Math.max(minScale, Math.min(maxScale, scale));
-
+    jsPlumb.setZoom(scale);
     // Recompute transform so cursor is the zoom anchor
     transformX = e.clientX - rect.left - px * scale;
     transformY = e.clientY - rect.top - py * scale;

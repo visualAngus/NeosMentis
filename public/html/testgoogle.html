@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion avec Google</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h2>Connexion avec Google</h2>
+    
+    <div id="g_id_onload"
+         data-client_id="933726926443-mfo0gij5g3f8pol7a6c0icj5h3pl7rtg.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+    </div>
+    
+    <div class="g_id_signin"
+         data-type="standard">
+    </div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            console.log("Token JWT Google :", response.credential);
+
+            // Décoder le token JWT (optionnel)
+            const data = JSON.parse(atob(response.credential.split('.')[1]));
+            console.log("Utilisateur connecté :", data);
+
+            alert("Bienvenue " + decodeURIComponent(escape(data.name)));
+        }
+    </script>
+</body>
+</html>
