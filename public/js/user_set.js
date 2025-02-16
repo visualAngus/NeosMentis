@@ -10,6 +10,11 @@ async function get_all_user_info() {
         div.appendChild(h2);
         let div_stt_profil = document.createElement('div');
         div.addEventListener('click', () => {
+            if (document.querySelector('.div_stt_profil')) {
+                document.querySelector('.div_stt_profil').remove();
+                return;
+            }
+            
             console.log('click');
             div_stt_profil.classList.add('div_stt_profil');
 
