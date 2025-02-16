@@ -1168,6 +1168,9 @@ app.post('/accept_request_collaborator', (req, res) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'Request not found' });
+        }
         const id_user = results[0].user1;
         connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [id_user, data.userID], (error, _results) => {
             if (error) {
@@ -1182,7 +1185,33 @@ app.post('/accept_request_collaborator', (req, res) => {
         });
     });
 });
+app.post('/accept_request_collaborator_by_id_user', (req, res) => {
+    let data = verificationAll(req, res);
+    if (!data) {
+        return res.redirect('/log');
+    }
+    const id_user = req.body.id_user;
 
+    connection.query('SELECT * FROM request_link_user WHERE user1 = ? AND user2 = ?', [id_user, data.userID], (error, results) => {
+        if (error) {
+            return res.json({ success: false, message: error.message });
+        }
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'Request not found' });
+        }
+        connection.query('INSERT INTO users_link (user1, user2) VALUES (?, ?)', [id_user, data.userID], (error, _results) => {
+            if (error) {
+                return res.json({ success: false, message: error.message });
+            }
+            connection.query('DELETE FROM request_link_user WHERE user1 = ? AND user2 = ?', [id_user, data.userID], (error, _results) => {
+                if (error) {
+                    return res.json({ success: false, message: error.message });
+                }
+                return res.json({ success: true, message: 'Request accepted successfully' });
+            });
+        });
+    });    
+});
 // app.listen(PORT, () => {
 //     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 // });

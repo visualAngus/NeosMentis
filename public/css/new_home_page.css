@@ -198,7 +198,7 @@ main{
     justify-content: flex-start;
     gap: 10px;
 }
-.add_doc, .open_agenda, .add_project,.add_colaborator{
+.add_doc, .open_agenda, .add_project,.add_colaborator,.show_demande{
     border: none;
     outline: none;
 
@@ -217,8 +217,15 @@ main{
 
     cursor: pointer;
 }
-.add_doc:hover, .open_agenda:hover, .add_project:hover{
+.show_demande{
+    background-color: var(--blue);
+}
+.add_doc:hover, .open_agenda:hover, .add_project:hover,.add_colaborator:hover{
     background-color: var(--green-middle-soft);
+}
+
+.show_demande:hover{
+    background-color: var(--blue-middle);
 }
 
 /* div_events */

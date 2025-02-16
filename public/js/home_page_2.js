@@ -353,22 +353,20 @@ function createCollaboratorDiv(name, email, id) {
     collabDiv.id = id;
     collabDiv.innerHTML = name.slice(0, 2).toUpperCase();
 
-    collabDiv.addEventListener('click', () => {
+    collabDiv.addEventListener('mouseover', () => {
+
         collabDiv.style.width = '100px';
         collabDiv.style.height = '50px';
         collabDiv.style.borderRadius = '10px';
 
         collabDiv.innerHTML = name;
+    });
 
-        let otherCollabs = document.querySelectorAll('.collaborator_div');
-        otherCollabs.forEach(otherCollab => {
-            if (otherCollab.id != id) {
-                otherCollab.style.width = '50px';
-                otherCollab.style.height = '50px';
-                otherCollab.style.borderRadius = '50%';
-                otherCollab.innerHTML = otherCollab.innerHTML.slice(0, 2).toUpperCase();
-            }
-        });
+    collabDiv.addEventListener('mouseout', () => {
+        collabDiv.style.width = '50px';
+        collabDiv.style.height = '50px';
+        collabDiv.style.borderRadius = '50%';
+        collabDiv.innerHTML = name.slice(0, 2).toUpperCase();
     });
 
 
@@ -488,4 +486,151 @@ async function new_project() {
     } catch (error) {
         console.error('Failed to create project:', error);
     }
+}
+
+let input_research = document.getElementsByClassName('input_research')[0];
+input_research.addEventListener('input', async (event) => {
+    if (input_research.attributes.type.value == 'NewCollaborator') {
+        if (input_research.value == '') {
+            let all_col = await get_all_actual_collaborators();
+            console.log(all_col);
+            afficher_recherche_user(all_col, 'Collaborator');
+        } else {
+            research_user(input_research.value);
+        }
+    }
+});
+
+document.querySelector('.show_demande').addEventListener('click', () => {
+    document.getElementsByClassName('collaborator_bnt_menu')[0].click();
+    document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
+    document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
+    have_request_collaborator();
+});
+
+function afficher_recherche_user(data,type='Collaborator') {
+    document.querySelector('.div_collaborators').innerHTML = '';
+    data.forEach(user => {
+        let div = document.createElement('div');
+        div.classList.add('collaborator_div');
+        div.innerHTML = `<h3>${user.name.slice(0, 2).toUpperCase()}</h3>`;
+
+        div.addEventListener('mouseover', () => {    
+            div.style.width = '100px';
+            div.style.height = '50px';
+            div.style.borderRadius = '10px';
+    
+            div.innerHTML = user.name;
+    
+        });
+        div.addEventListener('mouseout', () => {
+            div.style.width = '50px';
+            div.style.height = '50px';
+            div.style.borderRadius = '50%';
+            div.innerHTML = user.name.slice(0, 2).toUpperCase();
+        });
+
+        if (type == 'NewCollaborator') {
+            div.addEventListener('click', () => {
+                add_collaborator(user.id);
+            });
+        }else if (type == 'Collaborator') {
+            div.addEventListener('click', () => {
+                window.location.href = `/profil?user=${user.id}`;
+            });
+        }else if (type == 'DemandeCollaborator') {
+            div.style.backgroundColor = "var(--gray-light)";
+            div.addEventListener('click', () => {
+                if (div.style.backgroundColor == "var(--event-color6)"){
+                    accept_request_collaborator(user.id);
+                    have_request_collaborator();
+                }
+                div.style.backgroundColor = "var(--event-color6)";
+            });
+        }
+
+        document.querySelector('.div_collaborators').appendChild(div);
+    });
+}
+
+
+async function have_request_collaborator() {
+    const response = await fetch('/have_request_collaborator');
+    const data = await response.json();
+    if (data.success) {
+        console.log(data);
+        afficher_recherche_user(data.requests,'DemandeCollaborator');
+    } else {
+        console.error('Error fetching requests:', data.message);
+    }
+}
+
+
+async function research_user(input) {
+    try {
+        const response = await fetch('/rechercher_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ search: input })
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log(data);
+            afficher_recherche_user(data.users,'NewCollaborator');
+        } else {
+            console.error('Error fetching users:', data.message);
+        }
+    } catch (error) {
+        console.error('Failed to fetch users:', error);
+    }
+}
+
+async function get_all_actual_collaborators() {
+    try {
+        const response = await fetch('/get_all_collaborators_of_one_user');
+        const data = await response.json();
+        if (data.success) {
+            console.log(data);
+            return data.collaborators;
+        } else {
+            console.error('Error fetching collaborators:', data.message);
+        }
+    } catch (error) {
+        console.error('Failed to fetch collaborators:', error);
+    }
+}
+
+async function add_collaborator(id) {
+    try {
+        const response = await fetch('/request_add_collaborator', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ collaborator: id })
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log(data);
+        } else {
+            console.error('Error adding collaborator:', data.message);
+        }
+    } catch (error) {
+        console.error('Failed to add collaborator:', error);
+    }
+}
+async function accept_request_collaborator(id_user){
+    console.log("id_request:",id_user);
+    let response = await fetch('/accept_request_collaborator_by_id_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id_user: id_user})
+    });
+    let data = await response.json();
+    list_notif_texte.push(data.message);
+    return data;
 }
