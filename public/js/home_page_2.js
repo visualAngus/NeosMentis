@@ -508,6 +508,14 @@ document.querySelector('.show_demande').addEventListener('click', () => {
     have_request_collaborator();
 });
 
+document.querySelector(".add_colaborator").addEventListener('click', () => {
+    document.getElementsByClassName('collaborator_bnt_menu')[0].click();
+    document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
+    document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
+    document.getElementsByClassName('input_research')[0].focus();
+});
+
+
 function afficher_recherche_user(data,type='Collaborator') {
     document.querySelector('.div_collaborators').innerHTML = '';
     data.forEach(user => {
@@ -531,8 +539,12 @@ function afficher_recherche_user(data,type='Collaborator') {
         });
 
         if (type == 'NewCollaborator') {
+            div.style.backgroundColor = "var(--gray-light)";
             div.addEventListener('click', () => {
-                add_collaborator(user.id);
+                if (div.style.backgroundColor == "var(--event-color6)"){
+                    add_collaborator(user.id);
+                }
+                div.style.backgroundColor = "var(--event-color6)";
             });
         }else if (type == 'Collaborator') {
             div.addEventListener('click', () => {
@@ -543,7 +555,10 @@ function afficher_recherche_user(data,type='Collaborator') {
             div.addEventListener('click', () => {
                 if (div.style.backgroundColor == "var(--event-color6)"){
                     accept_request_collaborator(user.id);
-                    have_request_collaborator();
+                    setTimeout(() => {
+                        have_request_collaborator();
+                    }, 1000);
+                    
                 }
                 div.style.backgroundColor = "var(--event-color6)";
             });
@@ -558,7 +573,22 @@ async function have_request_collaborator() {
     const response = await fetch('/have_request_collaborator');
     const data = await response.json();
     if (data.success) {
-        console.log(data);
+        if (data.requests.length == 0) {
+            console.log("rien");
+            document.querySelector('.div_collaborators').innerHTML = '';
+            let div = document.createElement('div');
+            div.classList.add('nothing_div');
+            div.innerHTML = `<h3>Nothing to show</h3>`;
+            document.querySelector('.div_collaborators').appendChild(div);
+
+            setTimeout( async () => {
+                let all_col = await get_all_actual_collaborators();
+                console.log(all_col);
+                afficher_recherche_user(all_col, 'Collaborator');
+            }, 3000);
+
+            return;
+        }
         afficher_recherche_user(data.requests,'DemandeCollaborator');
     } else {
         console.error('Error fetching requests:', data.message);
@@ -593,6 +623,7 @@ async function get_all_actual_collaborators() {
         const data = await response.json();
         if (data.success) {
             console.log(data);
+            document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Research a collaborator');
             return data.collaborators;
         } else {
             console.error('Error fetching collaborators:', data.message);
@@ -613,9 +644,9 @@ async function add_collaborator(id) {
         });
         const data = await response.json();
         if (data.success) {
-            console.log(data);
+            list_notif_texte.push(data.message);
         } else {
-            console.error('Error adding collaborator:', data.message);
+            list_notif_texte.push(data.message);
         }
     } catch (error) {
         console.error('Failed to add collaborator:', error);

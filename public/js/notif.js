@@ -29,3 +29,18 @@ async function displayNotifications() {
 }
 displayNotifications();
 
+const ws = new WebSocket('ws://88.166.208.243:80');
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'change') {
+        list_notif_texte.push(data.message);
+    }
+};
+
+function send_message_to_id() {
+    console.log('sending update');
+    ws.send(JSON.stringify({
+        type: 'update_project'
+    }));
+}

@@ -1122,23 +1122,34 @@ app.post('/request_add_collaborator', (req, res) => {
     }
     const id_user = req.body.collaborator;
 
-    // Vérifier si le collaborateur existe déjà
-    connection.query('SELECT * FROM request_link_user WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)',
+    // Vérifier si les utilisateurs sont déjà collaborateurs
+    connection.query('SELECT * FROM users_link WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)',
         [data.userID, id_user, id_user, data.userID], (error, results) => {
             if (error) {
                 return res.json({ success: false, message: error.message });
             }
             if (results.length > 0) {
-                return res.json({ success: false, message: 'Request already sent' });
+                return res.json({ success: false, message: 'Users are already collaborators' });
             }
 
-            // Ajouter le collaborateur s'il n'existe pas déjà
-            connection.query('INSERT INTO request_link_user (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
-                if (error) {
-                    return res.json({ success: false, message: error.message });
-                }
-                return res.json({ success: true, message: 'Request sent successfully' });
-            });
+            // Vérifier si la demande de collaboration existe déjà
+            connection.query('SELECT * FROM request_link_user WHERE (user1 = ? AND user2 = ?) OR (user1 = ? AND user2 = ?)',
+                [data.userID, id_user, id_user, data.userID], (error, results) => {
+                    if (error) {
+                        return res.json({ success: false, message: error.message });
+                    }
+                    if (results.length > 0) {
+                        return res.json({ success: false, message: 'Request already sent' });
+                    }
+
+                    // Ajouter la demande de collaboration si elle n'existe pas déjà
+                    connection.query('INSERT INTO request_link_user (user1, user2) VALUES (?, ?)', [data.userID, id_user], (error, _results) => {
+                        if (error) {
+                            return res.json({ success: false, message: error.message });
+                        }
+                        return res.json({ success: true, message: 'Request sent successfully' });
+                    });
+                });
         });
 });
 app.get('/have_request_collaborator', (req, res) => {
