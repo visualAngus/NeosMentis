@@ -1025,7 +1025,7 @@ app.get('/carte/create_project', (req, res) => {
         return res.redirect('/log');
     }
     let title = 'Nouveau projet' + Math.floor(Math.random() * 1000);
-    connection.query('INSERT INTO projects (title) VALUES (?)', [title], (error, results) => {
+    connection.query('INSERT INTO projects (title,content) VALUES (?,?)', [title,""], (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
@@ -1569,7 +1569,6 @@ wss.on('connection', (ws) => {
         //     });
         // }
     });
-
     // Gérer la déconnexion
     ws.on('close', () => {
         console.log(`Client déconnecté : ${clientId}`);
@@ -1582,3 +1581,12 @@ wss.on('connection', (ws) => {
 server.listen(PORT, () => {
     console.log(`Serveur démarré sur http://localhost:${PORT}`);
 });
+
+// const ssl_server = https.createServer({
+//     key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, 'cert', 'csr.pem'))
+// }, app);
+
+// ssl_server.listen(PORT, () => {
+//     console.log(`Serveur démarré sur https://localhost:${PORT}`);
+// });

@@ -501,11 +501,19 @@ input_research.addEventListener('input', async (event) => {
     }
 });
 
-document.querySelector('.show_demande').addEventListener('click', () => {
-    document.getElementsByClassName('collaborator_bnt_menu')[0].click();
-    document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
-    document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
-    have_request_collaborator();
+document.querySelector('.show_demande').addEventListener('click', async () => {
+
+    if (document.querySelector('.show_demande').innerHTML == 'Show my collaborators') {
+        let all_col = await get_all_actual_collaborators();
+        document.querySelector('.show_demande').innerHTML = 'Show requests';
+        afficher_recherche_user(all_col, 'Collaborator');
+    } else {
+        document.getElementsByClassName('collaborator_bnt_menu')[0].click();
+        document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
+        document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
+        have_request_collaborator();
+        document.querySelector('.show_demande').innerHTML = 'Show my collaborators';
+    }
 });
 
 document.querySelector(".add_colaborator").addEventListener('click', () => {
@@ -578,15 +586,8 @@ async function have_request_collaborator() {
             document.querySelector('.div_collaborators').innerHTML = '';
             let div = document.createElement('div');
             div.classList.add('nothing_div');
-            div.innerHTML = `<h3>Nothing to show</h3>`;
+            div.innerHTML = `<h3>No collaborator requests</h3>`;
             document.querySelector('.div_collaborators').appendChild(div);
-
-            setTimeout( async () => {
-                let all_col = await get_all_actual_collaborators();
-                console.log(all_col);
-                afficher_recherche_user(all_col, 'Collaborator');
-            }, 3000);
-
             return;
         }
         afficher_recherche_user(data.requests,'DemandeCollaborator');
