@@ -639,7 +639,8 @@ app.get('/get_all_user_info', (req, res) => {
                             `SELECT projects_key_link.project_id_link as id, projects.title, projects.last_modified
                              FROM projects_key_link
                              LEFT JOIN projects ON projects_key_link.project_id_link = projects.id_project 
-                             WHERE projects_key_link.user_id_link = ?`,
+                             WHERE projects_key_link.user_id_link = ?
+                             ORDER BY last_modified DESC`,
                             [data.userID],
                             (error, resultsPro) => {
                                 if (error) {
@@ -1026,7 +1027,7 @@ app.get('/carte/create_project', (req, res) => {
     }
     let title = 'Nouveau projet' + Math.floor(Math.random() * 1000);
     connection.query('INSERT INTO projects (title,content,settings_connection,settings_bloc) VALUES (?, ?, ?, ?)', [title, '', '', ''], (error, results) => {
-        if (error) {
+        if (error) {    
             return res.json({ success: false, message: error.message });
         }
         connection.query('INSERT INTO projects_key_link (project_id_link, user_id_link) VALUES (?, ?)', [results.insertId, data.userID], (error, _results) => {

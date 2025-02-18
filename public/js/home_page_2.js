@@ -510,7 +510,7 @@ document.querySelector('.show_demande').addEventListener('click', async () => {
     } else {
         document.getElementsByClassName('collaborator_bnt_menu')[0].click();
         document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
-        document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
+        document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'You are looking for a new collaborator');
         have_request_collaborator();
         document.querySelector('.show_demande').innerHTML = 'Show my collaborators';
     }
@@ -519,7 +519,7 @@ document.querySelector('.show_demande').addEventListener('click', async () => {
 document.querySelector(".add_colaborator").addEventListener('click', () => {
     document.getElementsByClassName('collaborator_bnt_menu')[0].click();
     document.getElementsByClassName('input_research')[0].setAttribute('type', 'NewCollaborator');
-    document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Search for a new collaborator');
+    document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'You are looking for a new collaborator');
     document.getElementsByClassName('input_research')[0].focus();
 });
 
@@ -624,7 +624,7 @@ async function get_all_actual_collaborators() {
         const data = await response.json();
         if (data.success) {
             console.log(data);
-            document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'Research a collaborator');
+            document.getElementsByClassName('input_research')[0].setAttribute('placeholder', 'You are looking for a collaborator');
             return data.collaborators;
         } else {
             console.error('Error fetching collaborators:', data.message);
