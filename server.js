@@ -1025,7 +1025,7 @@ app.get('/carte/create_project', (req, res) => {
         return res.redirect('/log');
     }
     let title = 'Nouveau projet' + Math.floor(Math.random() * 1000);
-    connection.query('INSERT INTO projects (title,content) VALUES (?,?)', [title,""], (error, results) => {
+    connection.query('INSERT INTO projects (title,content,settings_connection,settings_bloc) VALUES (?, ?, ?, ?)', [title, '', '', ''], (error, results) => {
         if (error) {
             return res.json({ success: false, message: error.message });
         }
